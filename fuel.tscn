@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://t1exfq1xaj3n"]
+
+[ext_resource type="Script" path="res://fuel.gd" id="1_o8j2a"]
+[ext_resource type="Texture2D" uid="uid://dsnl4tg2c32a3" path="res://Fuel.png" id="1_ui6go"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cohwr"]
+radius = 17.0294
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_dfy6q"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ui6go")
+}],
+"loop": true,
+"name": &"Fuel",
+"speed": 5.0
+}]
+
+[node name="fuel" type="Area2D" groups=["Fuels"]]
+z_index = 7
+script = ExtResource("1_o8j2a")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_cohwr")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.01, 0.01)
+sprite_frames = SubResource("SpriteFrames_dfy6q")
+animation = &"Fuel"
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
