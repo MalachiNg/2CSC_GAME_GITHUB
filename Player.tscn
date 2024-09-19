@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://bepxtddddmlg4"]
+[gd_scene load_steps=43 format=3 uid="uid://bepxtddddmlg4"]
 
 [ext_resource type="Texture2D" uid="uid://dos25crvsgib1" path="res://sprite.png" id="1_1bvub"]
 [ext_resource type="Texture2D" uid="uid://drl5rd4osik8i" path="res://GAME OVER.png" id="1_itl3j"]
@@ -15,6 +15,9 @@
 [ext_resource type="Texture2D" uid="uid://d1cwfojrs0tw8" path="res://white_circle.png" id="12_mjkwy"]
 [ext_resource type="Texture2D" uid="uid://k8lq8kitd7b3" path="res://Back_Button.png" id="13_11oj3"]
 [ext_resource type="Texture2D" uid="uid://rfvm7bwulhle" path="res://Fuel_Left_Bar.png" id="13_naa4u"]
+[ext_resource type="AudioStream" uid="uid://c6eiqjqe6183m" path="res://Panting_sound_effect.mp3" id="16_ulpre"]
+[ext_resource type="AudioStream" uid="uid://cmhymp4dfrfcv" path="res://dying_sound.mp3" id="17_5xq42"]
+[ext_resource type="AudioStream" uid="uid://bt0ypjvetu608" path="res://health_decreased_sound_effect.mp3" id="18_mefyr"]
 
 [sub_resource type="GDScript" id="GDScript_v763d"]
 resource_name = "Player.gd"
@@ -42,6 +45,7 @@ script/source = "extends Area2D # using a 2D environment.
 @onready var food_timer_num : int
 @onready var nights_survived : int
 @onready var ran_game_over = false
+@onready var play_sound_called = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -76,6 +80,7 @@ func _process(delta):
 		move_and_animate(delta) # again, corresponds to a later function.
 		animate_time_of_day()
 		food()
+		play_sound()
 		Global.update_player_position(global_position)
 		fuel = Global.global_fuel # ensures that the fuel is always up to date with the corresponding global fuel variable. 
 		gain_health()
@@ -197,6 +202,7 @@ func critical_food():
 			# now im going to create a health variable which will be local, and decrease once the 7 second timer ends, so that the health slowly decreases when food is critical.
 			if food_bars == 0:
 				health -= 1 # decrease health by 1 every 7 seconds .
+				$Health_Decreased_AudioStreamPlayer.play()
 				is_losing_health = false
 			else:
 				is_losing_health = false
@@ -241,6 +247,7 @@ func display_health():
 			return
 		else:
 			game_over_run = true
+			$Dying_AudioStreamPlayer.play()
 			if Global.single_player:
 				game_over()
 			else:
@@ -274,6 +281,15 @@ func multiplayer_game_over():
 	$Game_over_screen_AnimatedSprite2D.global_position = Vector2(576, 324)
 	$Game_Over_Back_Button.set_deferred(\"disabled\", false)
 	$Score.global_position = Vector2(0,0)
+	$Score.text = \"SCORE: \"+ str(final_score)
+	if Global.day_and_night != 0:
+		if (Global.day_and_night % 2) == 0:
+			nights_survived = ((Global.day_and_night+2)/2)-1
+		else:
+			nights_survived = ((Global.day_and_night+1)/2)
+	else:
+		nights_survived = 0
+	$Nights_survived.text = \"NIGHTS SURVIVED: \" + str(nights_survived)
 	
 	
 
@@ -286,15 +302,6 @@ func game_over():
 	$Fuel_left_AnimatedSprite2D.hide()
 	$Fuel_Left_Label.hide()
 	
-	final_score = elapsed_time * 2 # this line of code helps prevent really low scores at the start of the game. 
-	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, then smaller, so it is more random than the time in seconds survived. 
-	final_score = round(final_score) # and this part rounds to a integer.
-	# this entire part of code determining the score helps the score increase exponentially, which corresponds to the game's difficulty increasing exponentially, meaning a higher score for a harder part of teh game played.
-	# this means the score is a better reflection of the player's skill, than just hte time they survived.
-	
-	$Score.text = \"SCORE: \"+ str(final_score)
-	$Score.position = Vector2(-50,30)
-	$Score.show()
 	if Global.day_and_night != 0:
 		if (Global.day_and_night % 2) == 0:
 			nights_survived = ((Global.day_and_night+2)/2)-1
@@ -302,6 +309,21 @@ func game_over():
 			nights_survived = ((Global.day_and_night+1)/2)
 	else:
 		nights_survived = 0
+	
+
+	final_score = elapsed_time * 2 # this line of code helps prevent really low scores at the start of the game. 
+	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, then smaller, so it is more random than the time in seconds survived. 
+	if nights_survived != 0:
+		final_score *= nights_survived # This section increases the final score majorly, for the number of nights survived. without this, someone who ran around in circles the whole time and stayed in the first night, dying of hunger,  could get the same score as someone who played 3 nights and died from mobs.
+	else: pass
+	final_score = round(final_score) # and this part rounds to a integer.
+	# this entire part of code determining the score helps the score increase exponentially, which corresponds to the game's difficulty increasing exponentially, meaning a higher score for a harder part of the game played.
+	# this means the score is a better reflection of the player's skill, than just the time they survived.
+	
+	$Score.text = \"SCORE: \"+ str(final_score)
+	$Score.position = Vector2(-50,30)
+	$Score.show()
+	
 	$Nights_survived.text = \"NIGHTS SURVIVED: \" + str(nights_survived)
 	$Nights_survived.position = Vector2(-90, 50)
 	$Nights_survived.show()
@@ -324,6 +346,7 @@ func gain_health():
 func _on_body_entered(body):
 	if body.is_in_group(\"Mobs\"):
 		health -= 1
+		$Health_Decreased_AudioStreamPlayer.play()
 	elif body.is_in_group(\"Boss_mobs\"):
 		health -= 3
 
@@ -372,6 +395,20 @@ func show_fuel_left():
 			$Fuel_left_AnimatedSprite2D.hide()
 	else:
 		return
+
+
+func play_sound():
+	if play_sound_called:
+		return
+	else:
+		play_sound_called = true
+		if (Global.day_and_night % 2) == 0:
+			$Panting_AudioStreamPlayer.volume_db = -20
+		else:
+			$Panting_AudioStreamPlayer.volume_db = -40
+		$Panting_AudioStreamPlayer.play()
+		await $Panting_AudioStreamPlayer.finished
+		play_sound_called = false
 "
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lw14p"]
@@ -744,6 +781,18 @@ position = Vector2(156, -110)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_kcc6s")
 animation = &"Fuel_Left"
+
+[node name="Panting_AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("16_ulpre")
+volume_db = -20.0
+
+[node name="Dying_AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("17_5xq42")
+volume_db = -40.0
+
+[node name="Health_Decreased_AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("18_mefyr")
+volume_db = -20.0
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

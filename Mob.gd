@@ -11,6 +11,7 @@ extends CharacterBody2D # using a 2D environment.
 @onready var max_y = 648 # max y co-ord
 @onready var spawned_today = false
 @onready var spawn_and_despawn_called = false
+@onready var sound_function_called = false
 
 func _ready():
 	spawn_in_random_location()
@@ -24,6 +25,7 @@ func _process(_delta):
 		move_to_player()
 		$AnimatedSprite2D.play("move_down")
 		spawn_and_despawn()
+		play_sound()
 	
 
 func move_to_player():
@@ -106,3 +108,19 @@ func spawn_in_random_location(): # this spawns the mob in a reandom location, wh
 
 # THE LARGE PART OF THE ANIMATION FUNCTION WAS REMOVED AS IT IS UNNECESSARY, 
 # AND DIDN'T FUNCTION DUE TO THE DiFFERENT TYPE OF MOVEMENT FROM PLAYER TO MOB.
+
+
+func play_sound():
+	if sound_function_called:
+		return
+	else:
+		sound_function_called = true
+		var interval = randf_range(2,40)
+		await get_tree().create_timer(interval).timeout
+		if (Global.day_and_night % 2) == 0: # if it is still night after the timer ends.
+			$AudioStreamPlayer2D.play()
+			$AudioListener2D.make_current()
+			$AudioListener2D.global_position = global_position # does this work?? CHECK. 
+			sound_function_called = false
+		else:
+			sound_function_called = false

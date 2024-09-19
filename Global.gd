@@ -30,7 +30,7 @@ func _process(_delta):
 			return
 		else:
 			daytime_process = true 
-			await get_tree().create_timer(45.0).timeout # this times the day, after 45 seconds it times out and makes the day turn back into night.
+			await get_tree().create_timer(30.0).timeout # this times the day, after 30 seconds it times out and makes the day turn back into night.
 			if day_and_night != 0: # this patches a potential error, as when re playing the game, this timer continues, so this could cause, if the player died during the day, the night to randomly turn to day for no reason. However, since day_and_night is reset to 0 in new playthroughs from the main scene, and this code doesn't run until minimum day_and_night = 1, this small line of code patches that potential error with no possible repercussions.
 				day_and_night += 1
 				daytime_process = false
