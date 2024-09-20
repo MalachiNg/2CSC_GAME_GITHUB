@@ -118,9 +118,10 @@ func play_sound():
 		var interval = randf_range(2,40)
 		await get_tree().create_timer(interval).timeout
 		if (Global.day_and_night % 2) == 0: # if it is still night after the timer ends.
-			$AudioStreamPlayer2D.play()
 			$AudioListener2D.make_current()
-			$AudioListener2D.global_position = global_position # does this work?? CHECK. 
+			$AudioStreamPlayer2D.pitch_scale = randf_range(0.1, 2)
+			$AudioListener2D.global_position = global_position
+			$AudioStreamPlayer2D.play()
 			sound_function_called = false
 		else:
 			sound_function_called = false

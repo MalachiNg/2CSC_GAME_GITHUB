@@ -3,6 +3,7 @@ extends Node
 @onready var Unselected_1_Player = preload("res://Unselected_1_Player.png")
 @onready var Selected_2_Players = preload("res://Selected_2_Players.png")
 @onready var Unselected_2_Players = preload("res://Unselected_2_Players.png")
+@onready var page = 1
 
 
 
@@ -15,7 +16,18 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	pass
+	if page == 1:
+		$Single_or_Multiplayer_TextureRect.show() ; $Single_Player_Button.show() ; $Multiplayer_Button.show()
+		$Mute_or_Unmute_TextureRect.hide() ; $Normal_or_Hard_Mode_TextureRect.hide()
+	elif page == 2:
+		$Normal_or_Hard_Mode_TextureRect.show()
+		$Single_or_Multiplayer_TextureRect.hide() ; $Mute_or_Unmute_TextureRect.hide() 
+		$Single_Player_Button.hide() ; $Multiplayer_Button.hide()
+	
+	elif page == 3:
+		$Mute_or_Unmute_TextureRect.show()
+		$Single_or_Multiplayer_TextureRect.hide() ; $Normal_or_Hard_Mode_TextureRect.hide() ; $Next_Button.hide()
+	else: return
 
 
 
@@ -55,4 +67,4 @@ func _on_back_button_pressed():
 
 
 func _on_next_button_pressed():
-	pass # Replace with function body.
+	page += 1

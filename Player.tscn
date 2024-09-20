@@ -80,7 +80,6 @@ func _process(delta):
 		move_and_animate(delta) # again, corresponds to a later function.
 		animate_time_of_day()
 		food()
-		play_sound()
 		Global.update_player_position(global_position)
 		fuel = Global.global_fuel # ensures that the fuel is always up to date with the corresponding global fuel variable. 
 		gain_health()
@@ -93,10 +92,14 @@ func _process(delta):
 			$Health_bar_AnimatedSprite2D.global_position = Vector2(-65, -20)
 			$Fuel_left_AnimatedSprite2D.global_position = Vector2(570, -40)
 			$Fuel_Left_Label.global_position = Vector2(630, -67)
+		elif Global.single_player == true:
+			play_panting_sound()
 		if Global.game_over:
 			return
 		else:
 			elapsed_time += delta
+	elif game_over_run == true and Global.game_over != true: # checks if player 1 has died, but player 2 in multiplayer is still alive.
+		elapsed_time += delta # then increases score as score increases even if one out of 2 players has died.
 
 func handle_input():
 	if Global.game_over != true:
@@ -266,29 +269,24 @@ func display_health():
 			
 
 func multiplayer_game_over():
-	print(\"Multiplayer game over complete\")
 	Global.game_over = true
 	$AnimatedSprite2D.hide() ; $Food_bar_AnimatedSprite2D.hide() ; $Health_bar_AnimatedSprite2D.hide() ; 
 	$Fuel_left_AnimatedSprite2D.hide() ; $Fuel_Left_Label.hide() ; 
 	$PointLight2D.color = Color.TRANSPARENT
 	$CollisionShape2D.set_deferred(\"disabled\", true)
-	$Nights_survived.show() ; $Score.show() ; $Game_over_screen_AnimatedSprite2D.show()
+	$Score.show() ; $Nights_survived.show()
+	$Game_over_screen_AnimatedSprite2D.show()
 	$Game_Over_Back_Button.show()
 	$Game_over_screen_AnimatedSprite2D.scale = Vector2(10,10)
-	$Game_Over_Back_Button.scale = Vector2(0.8,0.8)
-	$Game_Over_Back_Button.global_position = Vector2(-50,-50)
-	$Score.scale = Vector2(5,5) ; $Nights_survived.scale = Vector2(5,5)
+	$Game_Over_Back_Button.scale = Vector2(0.8,0.8) ; $Game_Over_Back_Button.global_position = Vector2(-50,-50)
+	$Score.scale = Vector2(7,7) ; $Score.global_position = Vector2(430,420)
+	$Nights_survived.scale = Vector2(7,7) ; $Nights_survived.global_position = Vector2(290, 500)
 	$Game_over_screen_AnimatedSprite2D.global_position = Vector2(576, 324)
 	$Game_Over_Back_Button.set_deferred(\"disabled\", false)
-	$Score.global_position = Vector2(0,0)
+	
+	calculate_score_and_nights_survived()
+	
 	$Score.text = \"SCORE: \"+ str(final_score)
-	if Global.day_and_night != 0:
-		if (Global.day_and_night % 2) == 0:
-			nights_survived = ((Global.day_and_night+2)/2)-1
-		else:
-			nights_survived = ((Global.day_and_night+1)/2)
-	else:
-		nights_survived = 0
 	$Nights_survived.text = \"NIGHTS SURVIVED: \" + str(nights_survived)
 	
 	
@@ -302,23 +300,7 @@ func game_over():
 	$Fuel_left_AnimatedSprite2D.hide()
 	$Fuel_Left_Label.hide()
 	
-	if Global.day_and_night != 0:
-		if (Global.day_and_night % 2) == 0:
-			nights_survived = ((Global.day_and_night+2)/2)-1
-		else:
-			nights_survived = ((Global.day_and_night+1)/2)
-	else:
-		nights_survived = 0
-	
-
-	final_score = elapsed_time * 2 # this line of code helps prevent really low scores at the start of the game. 
-	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, then smaller, so it is more random than the time in seconds survived. 
-	if nights_survived != 0:
-		final_score *= nights_survived # This section increases the final score majorly, for the number of nights survived. without this, someone who ran around in circles the whole time and stayed in the first night, dying of hunger,  could get the same score as someone who played 3 nights and died from mobs.
-	else: pass
-	final_score = round(final_score) # and this part rounds to a integer.
-	# this entire part of code determining the score helps the score increase exponentially, which corresponds to the game's difficulty increasing exponentially, meaning a higher score for a harder part of the game played.
-	# this means the score is a better reflection of the player's skill, than just the time they survived.
+	calculate_score_and_nights_survived()
 	
 	$Score.text = \"SCORE: \"+ str(final_score)
 	$Score.position = Vector2(-50,30)
@@ -397,7 +379,7 @@ func show_fuel_left():
 		return
 
 
-func play_sound():
+func play_panting_sound():
 	if play_sound_called:
 		return
 	else:
@@ -409,6 +391,25 @@ func play_sound():
 		$Panting_AudioStreamPlayer.play()
 		await $Panting_AudioStreamPlayer.finished
 		play_sound_called = false
+
+func calculate_score_and_nights_survived():
+	if Global.day_and_night != 0:
+		if (Global.day_and_night % 2) == 0:
+			nights_survived = ((Global.day_and_night+2)/2)-1
+		else:
+			nights_survived = ((Global.day_and_night+1)/2)
+	else:
+		nights_survived = 0
+	
+	final_score = elapsed_time * 2 # this line of code helps prevent really low scores at the start of the game. 
+	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, then smaller, so it is more random than the time in seconds survived. 
+	if nights_survived != 0:
+		final_score *= nights_survived+1 # This section increases the final score majorly, for the number of nights survived. without this, someone who ran around in circles the whole time and stayed in the first night, dying of hunger,  could get the same score as someone who played 3 nights and died from mobs. also +1 because otherwise surviving 1 night multiplies by 1 which does nothing.
+	else: pass
+	final_score = round(final_score) # and this part rounds to a integer.
+	# this entire part of code determining the score helps the score increase exponentially, which corresponds to the game's difficulty increasing exponentially, meaning a higher score for a harder part of the game played.
+	# this means the score is a better reflection of the player's skill, than just the time they survived.
+	
 "
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lw14p"]

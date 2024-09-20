@@ -55,21 +55,28 @@ func move_and_animate(): # the function that codes the animations.
 	$AnimatedSprite2D.play("move_down")
 
 func hide_during_day():
-	if (Global.day_and_night % 2) != 0:
-		$AnimatedSprite2D.hide()
-		$CollisionShape2D.disabled = true
-	else:
-		await get_tree().create_timer(5.0).timeout
-		if (Global.day_and_night % 2) == 0:
-			$AnimatedSprite2D.show()
-			$CollisionShape2D.disabled = false
-		
+	if (Global.day_and_night % 2) != 0: # if it is day. 
+		$AnimatedSprite2D.hide() # hide the boss mob.
+		$CollisionShape2D.set_deferred("disabled", true) # and disable the collision shape so the player wont be impacted.
+	else: # if it isn't day.
+		$AnimatedSprite2D.show() # show the boss mob
+		$CollisionShape2D.set_deferred("disabled", false) # and activate the collision shape.
+ 		
 		
 func spawn_in_random_location(): # this spawns the mob in a reandom location, which is no more than 80 away from the player, to keep things fair.
 	var random_x = randf_range(min_x, max_x)
 	var random_y = randf_range(min_y, max_y)
 	var player_x = Global.player_position.x
-	var player_y = Global.player_position.x
+	var player_y = Global.player_position.y
+	var player_2_x # declares these variables here, as then they are accessible across the function.
+	var player_2_y # doesn't set their value to anything, as if Global.single_player == true, then this would be a waste of processing power.
+	if Global.single_player == false: # checks if multiplayer is true.
+		player_2_x = Global.player_2_position.x # then fetches values for these two variables.
+		player_2_y = Global.player_2_position.y
+		if player_2_x < 0: # sets them as positive if they aren't, so that 
+			player_2_x *= -1
+		elif player_2_y < 0:
+			player_2_y *= -1
 	var boss_mob_x = random_x
 	var boss_mob_y = random_y
 	if player_x < 0:
@@ -82,11 +89,21 @@ func spawn_in_random_location(): # this spawns the mob in a reandom location, wh
 		boss_mob_x *= -1
 	var distance_x = player_x - boss_mob_x
 	var distance_y = player_y - boss_mob_y
-	if distance_x < 80 and distance_x > -80:
-		spawn_in_random_location()
-	if distance_y < 80 and distance_y > -80:
-		spawn_in_random_location()
-	else:
+	print(distance_x)
+	var alt_method = str(Vector2(random_x, random_y).distance_to(player_pos))
+	print (alt_method)
+	if Global.single_player == false:
+		var distance_x_2 = player_2_x - boss_mob_x
+		var distance_y_2 = player_2_y - boss_mob_y
+		if distance_x_2 < 150 and distance_x_2 > -150:
+			spawn_in_random_location()
+		if distance_y_2 < 150 and distance_y_2 > -150:
+			spawn_in_random_location()
+	if distance_x < 150 and distance_x > -150: # if the mob is too close to the player, then spawning there is unfair.
+		spawn_in_random_location() # so try again. 
+	if distance_y < 150 and distance_y > -150: # the same thing.
+		spawn_in_random_location() # try again.
+	else: # if the position isn't too close to the player
 		position = Vector2(random_x, random_y)
 
 # THE LARGE PART OF THE ANIMATION FUNCTION WAS REMOVED AS IT IS UNNECESSARY, 

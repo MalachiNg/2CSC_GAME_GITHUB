@@ -185,5 +185,6 @@ shape = SubResource("CapsuleShape2D_1oc8e")
 scale = Vector2(1, 1)
 stream = ExtResource("4_4sw8s")
 volume_db = 12.0
+pitch_scale = 0.1
 
 [node name="AudioListener2D" type="AudioListener2D" parent="."]
