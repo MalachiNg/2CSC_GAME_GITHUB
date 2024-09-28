@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dyy4hfv4ixlrv"
-path="res://.godot/imported/Screenshot 2024-08-07 at 1.43.55 PM.png-4e2ec09695a8ee8e9334a569b89865fa.ctex"
+uid="uid://6wwa48cueufk"
+path="res://.godot/imported/Food_20%.png-0014c35a33fecb212568d7505b1afb2c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Screenshot 2024-08-07 at 1.43.55 PM.png"
-dest_files=["res://.godot/imported/Screenshot 2024-08-07 at 1.43.55 PM.png-4e2ec09695a8ee8e9334a569b89865fa.ctex"]
+source_file="res://Food_20%.png"
+dest_files=["res://.godot/imported/Food_20%.png-0014c35a33fecb212568d7505b1afb2c.ctex"]
 
 [params]
 

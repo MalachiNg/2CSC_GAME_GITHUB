@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4e4ck3x4vsho"
-path="res://.godot/imported/Screenshot 2024-08-07 at 1.44.32 PM.png-fb2549d2b739a581087bd819d48d69a2.ctex"
+uid="uid://c60lpt57lfpwd"
+path="res://.godot/imported/Sleeper Mob skin.png-33a1125d4e847d48f02006899c3e7e18.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Screenshot 2024-08-07 at 1.44.32 PM.png"
-dest_files=["res://.godot/imported/Screenshot 2024-08-07 at 1.44.32 PM.png-fb2549d2b739a581087bd819d48d69a2.ctex"]
+source_file="res://Sleeper Mob skin.png"
+dest_files=["res://.godot/imported/Sleeper Mob skin.png-33a1125d4e847d48f02006899c3e7e18.ctex"]
 
 [params]
 

@@ -1,29 +1,39 @@
 extends Node
 @onready var page = 1
+@onready var page_1 = preload("res://INSTRUCTIONS_page_1.png")
+@onready var page_2 = preload("res://INSTRUCTIONS_page_2.png")
+@onready var page_3 = preload("res://INSTRUCTIONS_page_3.png")
+@onready var page_4 = preload("res://INSTRUCTIONS_page_4.png")
+@onready var page_5 = preload("res://INSTRUCTIONS_page_5.png")
+@onready var page_6 = preload("res://INSTRUCTIONS_page_6.png")
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
-
+	$TextureRect.texture = preload("res://INSTRUCTIONS_page_1.png")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
+	print(page)
+	$TextureRect.show()
+	$TextureRect.size = Vector2(1152, 648)
 	if page == 1:
-		$Page_1.show() ; $Back_Button.show()
-		$Page_2.hide() ; $Page_3.hide() ; $Page_4.hide()
-		$Next_Button.position = Vector2(926,543)
+		$TextureRect.texture = page_1
 	elif page == 2:
-		$Page_2.show()
-		$Page_1.hide() ; $Page_3.hide() ; $Page_4.hide()
-		$Next_Button.position = Vector2(960,363)
+		$TextureRect.texture = page_2
+		$Next_Button.global_position = Vector2(950,390)
 	elif page == 3:
-		$Page_3.show()
-		$Page_1.hide() ; $Page_2.hide() ; $Page_4.hide()
-		$Next_Button.position = Vector2(926,543)
+		$TextureRect.texture = page_3
+		$Next_Button.global_position = Vector2(926,543)
 	elif page == 4:
-		$Page_4.show() ; $Back_Button.show()
-		$Page_1.hide() ; $Page_2.hide() ; $Page_3.hide() ; $Next_Button.hide()
-		$Back_Button.position = Vector2(960,000)
+		$TextureRect.texture = page_4
+	elif page == 5:
+		$TextureRect.texture = page_5
+		$Back_Button.scale = Vector2(0.35,0.35)
+		$Back_Button.global_position = Vector2(35,-11)
+	elif page == 6:
+		$TextureRect.texture = page_6
+		$Next_Button.hide()
+		$Back_Button.scale = Vector2(0.35,0.35)
+		$Back_Button.global_position = Vector2(970,-11)
 
 
 

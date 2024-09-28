@@ -1,39 +1,18 @@
-[gd_scene load_steps=8 format=3 uid="uid://bdjjofvl3mm5m"]
+[gd_scene load_steps=5 format=3 uid="uid://bdjjofvl3mm5m"]
 
 [ext_resource type="Script" path="res://Instructions_Scene.gd" id="1_nxuhx"]
 [ext_resource type="Texture2D" uid="uid://k8lq8kitd7b3" path="res://Back_Button.png" id="2_h4sny"]
 [ext_resource type="Texture2D" uid="uid://dl8qkqk2fpiy6" path="res://INSTRUCTIONS_page_1.png" id="2_nhlqd"]
-[ext_resource type="Texture2D" uid="uid://ibnqvd3pivps" path="res://INSTRUCTIONS_page_2.png" id="5_ul1kb"]
-[ext_resource type="Texture2D" uid="uid://b6i478ekodgik" path="res://INSTRUCTIONS_page_3.png" id="6_038h4"]
 [ext_resource type="Texture2D" uid="uid://bbhpxr55ocqj1" path="res://Next_Button.png" id="6_pa0hn"]
-[ext_resource type="Texture2D" uid="uid://bp62d3enmtjaj" path="res://INSTRUCTIONS_page_4.png" id="7_5fvgp"]
 
 [node name="Instructions_Scene" type="Node"]
 script = ExtResource("1_nxuhx")
 
-[node name="Page_1" type="TextureRect" parent="."]
+[node name="TextureRect" type="TextureRect" parent="."]
 z_index = 1
 offset_right = 1152.0
 offset_bottom = 648.0
 texture = ExtResource("2_nhlqd")
-
-[node name="Page_2" type="TextureRect" parent="."]
-z_index = 1
-offset_right = 40.0
-offset_bottom = 40.0
-texture = ExtResource("5_ul1kb")
-
-[node name="Page_3" type="TextureRect" parent="."]
-z_index = 1
-offset_right = 40.0
-offset_bottom = 40.0
-texture = ExtResource("6_038h4")
-
-[node name="Page_4" type="TextureRect" parent="."]
-z_index = 1
-offset_right = 40.0
-offset_bottom = 40.0
-texture = ExtResource("7_5fvgp")
 
 [node name="Next_Button" type="Button" parent="."]
 z_index = 10

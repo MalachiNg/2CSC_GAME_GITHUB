@@ -1,18 +1,23 @@
-[gd_scene load_steps=9 format=3 uid="uid://b6il8d5ok5ax4"]
+[gd_scene load_steps=13 format=3 uid="uid://b6il8d5ok5ax4"]
 
 [ext_resource type="Script" path="res://Options_Scene.gd" id="1_8gq7s"]
 [ext_resource type="Texture2D" uid="uid://ci50sh0dj8nhp" path="res://Selected_1_Player.png" id="2_axyfp"]
 [ext_resource type="Texture2D" uid="uid://dis22x5wq1atj" path="res://Unselected_2_Players.png" id="3_s8tt5"]
 [ext_resource type="Texture2D" uid="uid://dpiosiuqwdko5" path="res://Mute_or_unmute.png" id="3_usyl2"]
-[ext_resource type="Texture2D" uid="uid://bh71lkmfp474f" path="res://Normal_or_Hard_mode.png" id="4_6wa0o"]
+[ext_resource type="Texture2D" uid="uid://ct3n7xj5kis2y" path="res://Normal_or_Hard_mode.png" id="4_6wa0o"]
 [ext_resource type="Texture2D" uid="uid://k8lq8kitd7b3" path="res://Back_Button.png" id="4_8vaa4"]
 [ext_resource type="Texture2D" uid="uid://bbhpxr55ocqj1" path="res://Next_Button.png" id="5_eaqws"]
 [ext_resource type="Texture2D" uid="uid://bgugdk8j8v4ae" path="res://Single_or_multiplayer.png" id="6_erkwl"]
+[ext_resource type="Texture2D" uid="uid://sk6f4dpp5dku" path="res://Hard_Mode_Button.png" id="9_8h18k"]
+[ext_resource type="Texture2D" uid="uid://btisgpk40omq6" path="res://Normal_Mode_Button.png" id="10_bu6h8"]
+[ext_resource type="Texture2D" uid="uid://b1glcseshapst" path="res://Selected_Unmute.png" id="11_yub4o"]
+[ext_resource type="Texture2D" uid="uid://bn334j18lycvm" path="res://Unselected_Mute.png" id="12_grnkl"]
 
 [node name="Options_Scene" type="Node"]
 script = ExtResource("1_8gq7s")
 
 [node name="Single_or_Multiplayer_TextureRect" type="TextureRect" parent="."]
+visible = false
 offset_right = 8662.0
 offset_bottom = 4872.0
 scale = Vector2(0.133, 0.133)
@@ -27,7 +32,7 @@ texture = ExtResource("3_usyl2")
 [node name="Normal_or_Hard_Mode_TextureRect" type="TextureRect" parent="."]
 offset_right = 40.0
 offset_bottom = 40.0
-scale = Vector2(0.133, 0.133)
+scale = Vector2(0.399, 0.399)
 texture = ExtResource("4_6wa0o")
 
 [node name="Single_Player_Button" type="Button" parent="."]
@@ -68,7 +73,46 @@ scale = Vector2(0.15, 0.15)
 icon = ExtResource("5_eaqws")
 flat = true
 
+[node name="Hard_Mode_Button" type="Button" parent="."]
+offset_left = 207.0
+offset_top = 489.0
+offset_right = 2535.0
+offset_bottom = 989.0
+scale = Vector2(0.3, 0.3)
+icon = ExtResource("9_8h18k")
+
+[node name="Normal_Mode_Button" type="Button" parent="."]
+offset_left = 205.0
+offset_top = 336.0
+offset_right = 2533.0
+offset_bottom = 836.0
+scale = Vector2(0.3, 0.3)
+icon = ExtResource("10_bu6h8")
+flat = true
+
+[node name="Unmute_Button" type="Button" parent="."]
+offset_left = 41.0
+offset_top = 331.0
+offset_right = 1093.0
+offset_bottom = 1103.0
+scale = Vector2(0.4, 0.4)
+icon = ExtResource("11_yub4o")
+flat = true
+
+[node name="Mute_Button" type="Button" parent="."]
+offset_left = 636.0
+offset_top = 332.0
+offset_right = 2056.0
+offset_bottom = 1264.0
+scale = Vector2(0.33, 0.33)
+icon = ExtResource("12_grnkl")
+flat = true
+
 [connection signal="pressed" from="Single_Player_Button" to="." method="_on_single_player_button_pressed"]
 [connection signal="pressed" from="Multiplayer_Button" to="." method="_on_multiplayer_button_pressed"]
 [connection signal="pressed" from="Back_Button" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="Next_Button" to="." method="_on_next_button_pressed"]
+[connection signal="pressed" from="Hard_Mode_Button" to="." method="_on_hard_mode_button_pressed"]
+[connection signal="pressed" from="Normal_Mode_Button" to="." method="_on_normal_mode_button_pressed"]
+[connection signal="pressed" from="Unmute_Button" to="." method="_on_unmute_button_pressed"]
+[connection signal="pressed" from="Mute_Button" to="." method="_on_mute_button_pressed"]

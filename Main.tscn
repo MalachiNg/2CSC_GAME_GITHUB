@@ -14,8 +14,11 @@ var reactor_scene = preload(\"res://Reactor.tscn\")
 var player_scene = preload(\"res://Player.tscn\")
 var player_2_scene = preload(\"res://Player_2.tscn\")
 var boss_mob_scene = preload(\"res://Boss_mob.tscn\")
+var sleeper_mob_scene = preload(\"res://sleeper_mob.tscn\")
+var bomb_trap_scene = preload(\"res://bomb_trap.tscn\")
 var spawned_fuel = false
 var spawned_boss_mobs = false
+var spawned_sleeper_mobs = false
 
 
 
@@ -38,6 +41,10 @@ func _ready():
 		#add_child(player)
 		var player_2 = player_2_scene.instantiate()
 		add_child(player_2)
+	if Global.Normal_mode == false:
+		for i in range (5):
+			var bomb_trap = bomb_trap_scene.instantiate()
+			add_child(bomb_trap)
 
 
 
@@ -52,31 +59,24 @@ func multiplayer_camera():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Global.single_player == false:
-		if (Global.day_and_night % 2) == 0 and Global.game_over != true:
-			$CanvasModulate.show()
-		else:
-			$CanvasModulate.hide()
-	spawn_boss_mobs()
-	spawn_fuel()
-	# process_mode = Node.PROCESS_MODE_PAUSABLE # this changes the main node to be pauseable, meaning that it can pause when the game is over. I no longer need this as the game doesn't pause once it's over. 
-	game_over_you_suck()
 	if Global.game_over:
-		return
+		$CanvasModulate.hide()
 	else:
-		return
+		if Global.single_player == false:
+			if (Global.day_and_night % 2) == 0 and Global.game_over != true:
+				$CanvasModulate.show()
+			else:
+				$CanvasModulate.hide()
+		spawn_boss_mobs()
+		spawn_fuel()
+		if Global.Normal_mode == false:
+			spawn_sleeper_mobs() # sleeper mobs are only spawned in hard mode. 
 
 func spawn_mobs():
 	for i in range(5):
 		var Mob = mob_scene.instantiate()
 		add_child(Mob)
 		#mob.position = Vector2(200 + i * 50, 200)
-
-
-func game_over_you_suck():
-	if Global.game_over == true: # if the game is over, then.
-		#hide_all()
-		pass
 
 
 		
@@ -90,16 +90,6 @@ func spawn_food():
 			var food = food_scene.instantiate()
 			add_child(food) # spawn a food.
 	
-'''
-func hide_all():
-	if (Global.day_and_night % 2) != 0:
-		for i in range(5):
-			$Food.hide()
-	else:
-		for i in range(5):
-			$Mob.hide()
-'''
-
 		
 func spawn_fuel():
 	var first_value = Global.day_and_night
@@ -114,18 +104,25 @@ func spawn_fuel():
 	
 
 func spawn_boss_mobs():
-	var old_day_and_night = Global.day_and_night
-	await get_tree().create_timer(0.5).timeout 
-	var new_day_and_night = Global.day_and_night
-	if old_day_and_night != new_day_and_night and (Global.day_and_night % 2) == 0 and spawned_boss_mobs == false: # if the time has ticked over to night, and this hasn't run before, then:
+	if (Global.day_and_night % 2) == 0 and spawned_boss_mobs == false: # if it is night, and this hasn't run before, then:
 		spawned_boss_mobs = true # make sure it doesn't run again.
 		if (((Global.day_and_night+2)/2)%3) == 0: # check if the number of nights is a multiple of 3, if it is:
 			var boss_mob = boss_mob_scene.instantiate() #spawn a new boss mob!
 			add_child(boss_mob) 
 		else: # if it isn't a multiple of three do nothing as a new boss mob only spawns into the game every 3 nights.
 			return
-	elif old_day_and_night != new_day_and_night and (Global.day_and_night % 2) != 0: # if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, boss mobs can spawn.
+	elif (Global.day_and_night % 2) != 0 and spawned_boss_mobs == true: # if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, boss mobs can spawn.
 		spawned_boss_mobs = false
+
+func spawn_sleeper_mobs():
+	if (Global.day_and_night % 2) == 0 and spawned_sleeper_mobs == false: # if it is night, and this hasn't run before, then:
+		spawned_sleeper_mobs = true # make sure it doesn't run again.
+		if (((Global.day_and_night+2)/2)%2) == 0: # check if the number of nights is even, if it is:
+			var sleeper_mob = sleeper_mob_scene.instantiate()
+			add_child(sleeper_mob)
+	elif (Global.day_and_night % 2) != 0 and spawned_sleeper_mobs == true: # if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, boss mobs can spawn.
+		spawned_sleeper_mobs = false
+
 "
 
 [node name="Main" type="Node"]
@@ -135,12 +132,13 @@ script = SubResource("GDScript_7cmft")
 z_index = 1
 offset_left = -160.0
 offset_top = -88.0
-offset_right = 3711.0
-offset_bottom = 2098.0
+offset_right = 3729.0
+offset_bottom = 2101.0
 scale = Vector2(0.38, 0.38)
 texture = ExtResource("4_hqnie")
 
 [node name="Player" parent="." instance=ExtResource("2_bcccv")]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
 color = Color(0, 0, 0, 1)

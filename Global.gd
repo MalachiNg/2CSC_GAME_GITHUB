@@ -9,6 +9,8 @@ var daytime_process = false
 var single_player = true
 var multiplayer_game_over : int  = 0
 var Player = preload("res://Player.tscn")
+var Normal_mode = true
+var Unmute = true
 
 func update_player_2_position(pos: Vector2):
 	player_2_position = pos
@@ -50,3 +52,9 @@ func update_single_player(true_or_false : bool):
 	
 func update_multiplayer_game_over(new_game_over : int):
 	multiplayer_game_over = new_game_over
+
+func update_normal_mode(boolean_value : bool):
+	Normal_mode = boolean_value
+	
+func update_unmute(mute_or_unmute : bool):
+	Unmute = mute_or_unmute

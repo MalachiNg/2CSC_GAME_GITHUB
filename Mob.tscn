@@ -171,7 +171,7 @@ script = ExtResource("1_6o1rp")
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-z_index = 7
+z_index = 3
 scale = Vector2(0.07, 0.07)
 sprite_frames = SubResource("SpriteFrames_q7x7f")
 animation = &"move_down"
@@ -182,7 +182,6 @@ scale = Vector2(0.07, 0.07)
 shape = SubResource("CapsuleShape2D_1oc8e")
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
-scale = Vector2(1, 1)
 stream = ExtResource("4_4sw8s")
 volume_db = 12.0
 pitch_scale = 0.1
