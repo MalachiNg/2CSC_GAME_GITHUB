@@ -7,14 +7,16 @@
 
 [sub_resource type="GDScript" id="GDScript_yxjlt"]
 script/source = "extends Node
-var Main_Title = preload(\"res://Main_Title.png\")
-var Hard_Mode_Main_Title = preload(\"res://Hard_Mode_Main_Title.png\")
+const Main_Title = preload(\"res://Main_Title.png\")
+const Hard_Mode_Main_Title = preload(\"res://Hard_Mode_Main_Title.png\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	preload(\"res://Options_Scene.tscn\")
-	# preloads the Options scene as it has more nodes, and larger files, so takes longer to load otherwise.
-	# this is not needed for the instructions or main scenes, as they are easier to load. 
+	# since this was first introduced, I hae made the options section far more optimised, and easier to load.
+	# this means preloading it is un necessary, but I am keeping it here, as there is a tiny <0.5 second lag
+	# on the FIRST time the options scene is accessed in a run of the project, without this. Therefore, it might
+	# as well remain because it doesn't hinder anything and helps optimise! :D
 	if Global.Normal_mode == true:
 		$TextureRect.texture = Main_Title
 	else:
@@ -28,7 +30,6 @@ func _on_instructions_button_pressed():
 
 
 func _on_options_button_pressed():
-	print(\"signal recieved\")
 	get_tree().change_scene_to_file(\"res://Options_Scene.tscn\")
 "
 

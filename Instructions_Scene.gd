@@ -1,11 +1,11 @@
 extends Node
 @onready var page = 1
-@onready var page_1 = preload("res://INSTRUCTIONS_page_1.png")
-@onready var page_2 = preload("res://INSTRUCTIONS_page_2.png")
-@onready var page_3 = preload("res://INSTRUCTIONS_page_3.png")
-@onready var page_4 = preload("res://INSTRUCTIONS_page_4.png")
-@onready var page_5 = preload("res://INSTRUCTIONS_page_5.png")
-@onready var page_6 = preload("res://INSTRUCTIONS_page_6.png")
+const page_1 = preload("res://INSTRUCTIONS_page_1.png")
+const page_2 = preload("res://INSTRUCTIONS_page_2.png")
+const page_3 = preload("res://INSTRUCTIONS_page_3.png")
+const page_4 = preload("res://INSTRUCTIONS_page_4.png")
+const page_5 = preload("res://INSTRUCTIONS_page_5.png")
+const page_6 = preload("res://INSTRUCTIONS_page_6.png")
 
 func _ready():
 	$TextureRect.texture = preload("res://INSTRUCTIONS_page_1.png")

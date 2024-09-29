@@ -4,6 +4,15 @@ const Unselected_1_Player = preload("res://Unselected_1_Player.png")
 const Selected_2_Players = preload("res://Selected_2_Players.png")
 const Unselected_2_Players = preload("res://Unselected_2_Players.png")
 @onready var page = 1
+
+# TextureRext textures, the different pages: 
+const Single_or_Multiplayer = preload("res://Single_or_Multiplayer.png")
+const Normal_or_Hard_Mode = preload("res://Normal_or_Hard_Mode.png")
+const Mute_or_Unmute = preload("res://Mute_or_Unmute.png")
+
+# The following are declared here, but not set to a value.
+# instead, they are set values before they appear, to spread the load out and make performance better. 
+# these are variables, not constants, as they change, as they are assigned values later.
 var selected_Normal
 var unselected_Normal
 var selected_Hard 
@@ -17,7 +26,6 @@ var Unselected_Mute
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("loaded on")
 	$Normal_Mode_Button.hide()
 	$Hard_Mode_Button.hide()
 	$Mute_Button.hide() 
@@ -30,18 +38,19 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	if page == 1:
-		$Single_or_Multiplayer_TextureRect.show() ; $Single_Player_Button.show() ; $Multiplayer_Button.show()
-		$Mute_or_Unmute_TextureRect.hide() ; $Normal_or_Hard_Mode_TextureRect.hide()
+		$TextureRect.texture = Single_or_Multiplayer
+		$Single_Player_Button.show()
+		$Multiplayer_Button.show()
+		
 	elif page == 2:
-		$Normal_or_Hard_Mode_TextureRect.show()
-		$Single_or_Multiplayer_TextureRect.hide() ; $Mute_or_Unmute_TextureRect.hide() 
+		$TextureRect.texture = Normal_or_Hard_Mode
 		$Single_Player_Button.hide() ; $Multiplayer_Button.hide()
 		$Hard_Mode_Button.show() ; $Normal_Mode_Button.show()
 		normal_or_hard()
 	
 	elif page == 3:
-		$Mute_or_Unmute_TextureRect.show()
-		$Single_or_Multiplayer_TextureRect.hide() ; $Normal_or_Hard_Mode_TextureRect.hide() ; $Next_Button.hide()
+		$TextureRect.texture = Mute_or_Unmute
+		$Next_Button.hide()
 		$Hard_Mode_Button.hide() ; $Normal_Mode_Button.hide()
 		mute_or_unmute()
 
@@ -85,11 +94,15 @@ func _on_back_button_pressed():
 func _on_next_button_pressed():
 	page += 1
 	if page == 2:
+		# these previously declared variables are now given values, so that the stress on the CPU
+		# is spread out throughout the scene, as opposed to all happening at the start, causing lag.
+		# this here runs if the page is Normal or hard mode, and only runs when the next button is pressed.
 		selected_Normal = preload("res://Normal_Mode_Selected.png")
 		unselected_Normal = preload("res://Normal_Mode_Button.png")
 		selected_Hard = preload("res://Hard_Mode_Selected.png")
 		unselected_Hard = preload("res://Hard_Mode_Button.png")
 	else:
+		# this runs on Mute or Unmute. the first page runs at the start so doesn't need to be in here.
 		Selected_Unmute = preload("res://Selected_Unmute.png")
 		Unselected_Unmute = preload("res://Unselected_Unmute.png")
 		Selected_Mute = preload("res://Selected_Mute.png")
