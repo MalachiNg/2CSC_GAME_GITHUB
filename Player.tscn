@@ -477,7 +477,9 @@ func calculate_score_and_nights_survived():
 	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, then smaller, so it is more random than the time in seconds survived. 
 	if nights_survived != 0:
 		final_score *= nights_survived+1 # This section increases the final score majorly, for the number of nights survived. without this, someone who ran around in circles the whole time and stayed in the first night, dying of hunger,  could get the same score as someone who played 3 nights and died from mobs. also +1 because otherwise surviving 1 night multiplies by 1 which does nothing.
-	else: pass
+	if not Global.Normal_mode:
+		final_score *= 1.5 
+		# if the user is on hard mode, increase the score by 50%
 	final_score = round(final_score) # and this part rounds to a integer.
 	# this entire part of code determining the score helps the score increase exponentially, which corresponds to the game's difficulty increasing exponentially, meaning a higher score for a harder part of the game played.
 	# this means the score is a better reflection of the player's skill, than just the time they survived.
@@ -500,7 +502,6 @@ func display_food_fuel_and_health_multiplayer():
 			$Show_Fuel_Left_PointLight2D.hide()
 			$Fuel_left_AnimatedSprite2D.hide()
 			$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
-			print(\"hidden, if still visible, then this is somewhere in process running.\")
 			
 			
 			await get_tree().create_timer(30.0).timeout 
