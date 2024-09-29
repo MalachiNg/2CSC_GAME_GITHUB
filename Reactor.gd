@@ -35,4 +35,3 @@ func detect_player(area):
 				Global.update_fuel(0)
 				new_day_night = day_night + 1
 				Global.update_day_and_night(new_day_night)
-				

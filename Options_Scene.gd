@@ -1,22 +1,23 @@
 extends Node
-@onready var Selected_1_Player = preload("res://Selected_1_Player.png")
-@onready var Unselected_1_Player = preload("res://Unselected_1_Player.png")
-@onready var Selected_2_Players = preload("res://Selected_2_Players.png")
-@onready var Unselected_2_Players = preload("res://Unselected_2_Players.png")
+const Selected_1_Player = preload("res://Selected_1_Player.png")
+const Unselected_1_Player = preload("res://Unselected_1_Player.png")
+const Selected_2_Players = preload("res://Selected_2_Players.png")
+const Unselected_2_Players = preload("res://Unselected_2_Players.png")
 @onready var page = 1
-@onready var selected_Normal = preload("res://Normal_Mode_Selected.png")
-@onready var unselected_Normal = preload("res://Normal_Mode_Button.png")
-@onready var selected_Hard = preload("res://Hard_Mode_Selected.png")
-@onready var unselected_Hard = preload("res://Hard_Mode_Button.png")
-@onready var Selected_Unmute = preload("res://Selected_Unmute.png")
-@onready var Unselected_Unmute = preload("res://Unselected_Unmute.png")
-@onready var Selected_Mute = preload("res://Selected_Mute.png")
-@onready var Unselected_Mute = preload("res://Unselected_Mute.png")
+var selected_Normal
+var unselected_Normal
+var selected_Hard 
+var unselected_Hard 
+var Selected_Unmute 
+var Unselected_Unmute
+var Selected_Mute
+var Unselected_Mute
 
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print("loaded on")
 	$Normal_Mode_Button.hide()
 	$Hard_Mode_Button.hide()
 	$Mute_Button.hide() 
@@ -43,7 +44,6 @@ func _process(_delta):
 		$Single_or_Multiplayer_TextureRect.hide() ; $Normal_or_Hard_Mode_TextureRect.hide() ; $Next_Button.hide()
 		$Hard_Mode_Button.hide() ; $Normal_Mode_Button.hide()
 		mute_or_unmute()
-	else: return
 
 
 
@@ -84,6 +84,16 @@ func _on_back_button_pressed():
 
 func _on_next_button_pressed():
 	page += 1
+	if page == 2:
+		selected_Normal = preload("res://Normal_Mode_Selected.png")
+		unselected_Normal = preload("res://Normal_Mode_Button.png")
+		selected_Hard = preload("res://Hard_Mode_Selected.png")
+		unselected_Hard = preload("res://Hard_Mode_Button.png")
+	else:
+		Selected_Unmute = preload("res://Selected_Unmute.png")
+		Unselected_Unmute = preload("res://Unselected_Unmute.png")
+		Selected_Mute = preload("res://Selected_Mute.png")
+		Unselected_Mute = preload("res://Unselected_Mute.png")
 
 func normal_or_hard():
 	if Global.Normal_mode == true:

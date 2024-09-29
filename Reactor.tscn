@@ -39,6 +39,7 @@ position = Vector2(789, 300)
 scale = Vector2(0.05, 0.05)
 sprite_frames = SubResource("SpriteFrames_0f6ae")
 animation = &"Reactor_on"
+speed_scale = 2.08165e-12
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(794, 323)

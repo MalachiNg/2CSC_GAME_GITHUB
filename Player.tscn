@@ -48,6 +48,9 @@ script/source = "extends Area2D # using a 2D environment.
 @onready var Food_CRITICAL = preload(\"res://Critical_food_texture.png\") 
 @onready var display_multiplayer_called = false
 @onready var unmute = Global.Unmute
+@onready var died_from_starvation = false
+@onready var died_from_mobs = false
+@onready var died_from_traps = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -66,7 +69,7 @@ func _ready():
 	$Fuel_left_AnimatedSprite2D.hide()
 	$Fuel_Left_Label.hide()
 	$Nights_survived.hide()
-	if Global.single_player == false: 
+	if not Global.single_player: 
 		$Camera2D.enabled = false
 		$Food_bar_AnimatedSprite2D.scale = Vector2(0.6,0.6)
 		$Health_bar_AnimatedSprite2D.scale = Vector2(0.12,0.12)
@@ -83,7 +86,7 @@ func _ready():
 func _process(delta):
 	if Global.multiplayer_game_over == 2: # checks if both players have died.
 		multiplayer_game_over() # runs the multiplayer game over function.
-	if game_over_run == false: # checks if player 1 has died. this line increases performace, as in multiplayer game over none of this code, besides the code to check if both players have died, which runs before this regardless of these parameters, is necessary, so is slowing the game down. Additionally, running process without these parameters would get the mobs to follow player 1 when they are dead, which is very dumb and stupid, like how much comment text i've put on this line. s
+	if not game_over_run: # checks if player 1 has died. this line increases performace, as in multiplayer game over none of this code, besides the code to check if both players have died, which runs before this regardless of these parameters, is necessary, so is slowing the game down. Additionally, running process without these parameters would get the mobs to follow player 1 when they are dead, which is very dumb and stupid, like how much comment text i've put on this line. s
 		handle_input() #corresponds to a later function, doesn't matter the order of which functions are called, as the computer reads everything before executing it. 
 		move_and_animate(delta) # again, corresponds to a later function.
 		animate_time_of_day()
@@ -95,45 +98,34 @@ func _process(delta):
 		display_health()
 		critical_food()
 		getting_hungry()
-		if Global.single_player == false:
-			$Food_bar_AnimatedSprite2D.global_position = Vector2(-65,-65)
-			$Health_bar_AnimatedSprite2D.global_position = Vector2(-65, -20)
+		if not Global.single_player:
+			$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
+			$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
 			$Fuel_left_AnimatedSprite2D.global_position = Vector2(570, -40)
 			$Game_Over_Back_Button.global_position = Vector2(1100,635) 
-			if (Global.day_and_night % 2) == 0:
-				display_food_fuel_and_health_multiplayer()
-				$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.show()
-			else:
-				$Health_Bar_PointLight2D.hide()
-				$Food_Bars_PointLight2D.hide()
-				$Show_Fuel_Left_PointLight2D.hide()
-				$Fuel_left_AnimatedSprite2D.hide()
-				$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
-		elif Global.single_player == true:
-			if unmute == true:
+			display_food_fuel_and_health_multiplayer()
+		elif Global.single_player:
+			if unmute:
 				play_panting_sound()
 				$Game_Over_Back_Button.show()
 			$Health_Bar_PointLight2D.hide()
-		if Global.game_over == false:
+		if not Global.game_over:
 			elapsed_time += delta
-	elif game_over_run == true and Global.game_over != true: # checks if player 1 has died, but player 2 in multiplayer is still alive.
+	elif game_over_run and not Global.game_over: # checks if player 1 has died, but player 2 in multiplayer is still alive.
 		elapsed_time += delta # then increases score as score increases even if one out of 2 players has died.
 		if (Global.day_and_night % 2) == 0:
 			display_food_fuel_and_health_multiplayer()
 			show_fuel_left()
 		else:
-			$Health_Bar_PointLight2D.hide()
-			$Food_Bars_PointLight2D.hide()
-			$Show_Fuel_Left_PointLight2D.hide()
 			$Fuel_left_AnimatedSprite2D.hide()
 			$Fuel_Left_Label.hide()
 		$Game_Over_Back_Button.global_position = Vector2(1100,635)
 		
 
 func handle_input():
-	if Global.game_over != true:
+	if not Global.game_over:
 		var input_direction = Vector2.ZERO
-		if Global.single_player == true:
+		if Global.single_player:
 			if Input.is_action_pressed(\"move_up\") or Input.is_action_pressed(\"move_up_2\"): # if the input action \"move_up\" as set in project settings, and is activated by w or the up key, then:
 				input_direction.y -= 1 # change the \"y\" direction by -1, setting the direction as moving up. 
 			if Input.is_action_pressed(\"move_down\") or Input.is_action_pressed(\"move_down_2\"): #same as the last one, but for input action \"move_down\". 
@@ -222,23 +214,27 @@ func food():
 
 func critical_food():
 	if food_bars == 0:
-		# $Food_bar_AnimatedSprite2D.play(\"CRITICAL!\") # this one means 0%, player starts losing health.
-		if is_losing_health == true:
+		# at 0%, player starts losing health.
+		if is_losing_health:
 			return
 		else:
 			is_losing_health = true
 			$Food_bar_AnimatedSprite2D.play(\"CRITICAL!\") # this one means 0%, player starts losing health.
 			# im going to create a timer node and use that to decrease the health, with it decreasing for every few seconds with critical food. 
-			#print(\"test if this works\")
-			if Global.Normal_mode == true:
+			if Global.Normal_mode:
 				await get_tree().create_timer(7.0).timeout # waits 7 seconds to decrease health at critical hunger.
 			else:
 				await get_tree().create_timer(4.0).timeout # in hard mode, health decreases at critical hunger, faster. 
-			#print (\"does it work?\")
 			# now im going to create a health variable which will be local, and decrease once the 7 second timer ends, so that the health slowly decreases when food is critical.
 			if food_bars == 0:
 				health -= 1 # decrease health by 1 every 7 seconds.
-				if unmute == true:
+				if health == 0:
+					died_from_starvation = true
+					# this checks if the decrease in health because of hunger, killed the player.
+					# if it did, it sets died_from_starvation to true, which will be later referenced.
+					# pretty much it lets the user know how / why they died. 
+					# if this was what killed them, the above sets it to true so this can be done.
+				if unmute:
 					$Health_Decreased_AudioStreamPlayer.play()
 				is_losing_health = false
 			else:
@@ -247,12 +243,12 @@ func critical_food():
 			
 			
 func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT INCREASING DIFFICULTY OVER TIME FOR \"LEVELS\"
-	if touched_food == false: # There is a timer that starts right after a food is touched, which then reduces the food_bars, if its already timing, this should be skipped. 
-		if is_losing_hunger == true: # This avoids multiple runs of the code.
+	if not touched_food: # There is a timer that starts right after a food is touched, which then reduces the food_bars, if its already timing, this should be skipped. 
+		if is_losing_hunger: # This avoids multiple runs of the code.
 			return
 		else:
 			is_losing_hunger = true
-			if Global.Normal_mode == true:
+			if Global.Normal_mode:
 				food_wait_time = (25*(1-(Global.day_and_night * 0.05))) # ok so pretty much we multiply the Global.day_and_night variable by 0.05, and subtract this from 1, and multiply the resulting number by the original number of seconds, 25. 
 			# so on the first night, this is the equation:
 			# 0 * 0.05 = 0, 1 - 0 = 1, 25 * 1 = 25, therefore food_wait_time = 25 seconds. 
@@ -263,13 +259,11 @@ func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT IN
 			else:
 				food_wait_time = (15*(1-(Global.day_and_night * 0.08))) # a far shorter, and more quickly decreasing time to reduce hunger. 
 			await get_tree().create_timer(food_wait_time).timeout
-			if touched_food == false: # This ensures that during the timer, the player hasn't touched a food and started a new timer.
+			if not touched_food: # This ensures that during the timer, the player hasn't touched a food and started a new timer.
 				food_bars -= 1
 				is_losing_hunger = false
 			else:
 				is_losing_hunger = false
-	else:
-		return
 
 
 func display_health():
@@ -284,14 +278,14 @@ func display_health():
 		$Health_bar_AnimatedSprite2D.play(\"3_Hearts\")
 	else:
 		#position.x = 0 ; position.y = 0 # prevents the player from moving, allowing game over sprites to remain still.
-		if game_over_run == true:
+		if game_over_run:
 			return
 		else:
 			game_over_run = true
-			if Global.single_player == false:
+			if not Global.single_player:
 				$Food_Bars_PointLight2D.energy = 0
 				$Health_Bar_PointLight2D.energy = 0
-				if unmute == true:
+				if unmute:
 					$Dying_AudioStreamPlayer.play()
 			if Global.single_player:
 				game_over()
@@ -299,7 +293,6 @@ func display_health():
 				Global.update_multiplayer_game_over(Global.multiplayer_game_over+1)
 				$AnimatedSprite2D.hide()
 				$PointLight2D.color = Color.TRANSPARENT
-				print(Global.multiplayer_game_over)
 				global_position = Vector2(-1, -1)
 				Global.update_player_position(global_position)
 				$Food_bar_AnimatedSprite2D.hide()
@@ -338,7 +331,6 @@ func game_over():
 	$Game_over_screen_AnimatedSprite2D.show()
 	$Night_scene_AnimatedSprite2D.hide()
 	$Food_bar_AnimatedSprite2D.hide()
-	#$Game_Over_Back_Button.show()
 	$Game_Over_Back_Button.position = Vector2(-230,-130)
 	$Fuel_left_AnimatedSprite2D.hide()
 	$Fuel_Left_Label.hide()
@@ -353,14 +345,23 @@ func game_over():
 	$Nights_survived.position = Vector2(-90, 50)
 	$Nights_survived.show()
 	$Game_Over_Back_Button.set_deferred(\"disabled\", false)
+	
+	if died_from_mobs:
+		$Died_from_Label.text = \"DIED FROM MOBS\"
+	elif died_from_starvation:
+		$Died_from_Label.text = \"DIED FROM STARVATION\"
+		$Died_from_Label.position.x = -100
+	elif died_from_traps:
+		$Died_from_Label.text = \"DIED FROM BOMBS\"
+		# CHANGE THIS IF MORE TRAPS ARE ADDED THAT AREN'T BOMBS! 
 	Global.update_game_over(true)
 
 
 func gain_health():
-	if is_gaining_health == true:
+	if is_gaining_health:
 		return
 	is_gaining_health = true
-	if Global.Normal_mode == true:
+	if Global.Normal_mode:
 		await get_tree().create_timer(30+(Global.day_and_night)).timeout # waits 30 seconds, plus 1 more second for he number of days and nights you've survived. This means that health regens on the first night every 30 seconds, then slower as the game progresses, increasing difficulty over time.
 	else:
 		await get_tree().create_timer(45+(Global.day_and_night)).timeout # if the user has selected hard mode, they regenerate health slower.
@@ -373,13 +374,20 @@ func gain_health():
 func _on_body_entered(body):
 	if body.is_in_group(\"Mobs\"):
 		health -= 1
-		if unmute == true:
+		if health == 0:
+			# if this caused the player to die:
+			died_from_mobs = true
+		if unmute:
 			$Health_Decreased_AudioStreamPlayer.play()
 	elif body.is_in_group(\"Boss_mobs\"):
 		health -= 3
+		died_from_mobs = true
 	elif body.is_in_group(\"Sleeper_Mobs\"):
 		health -= 1
-		if unmute == true:
+		if health == 0:
+			# if this caused the player to die:
+			died_from_mobs = true
+		if unmute:
 			$Health_Decreased_AudioStreamPlayer.play()
 
 func _on_area_entered(area):
@@ -399,6 +407,11 @@ func _on_area_entered(area):
 		Global.update_fuel(fuel+1)
 	elif area.is_in_group(\"Bombs\"):
 		health -= 2
+		if health == 0 or health < 0:
+			health = 0
+			died_from_traps = true
+		if unmute:
+			$Health_Decreased_AudioStreamPlayer.play()
 		speed = 100
 		await get_tree().create_timer(2.0).timeout
 		speed = 200
@@ -415,13 +428,13 @@ func show_fuel_left():
 		$Fuel_Left_Label.global_position = $Fuel_left_AnimatedSprite2D.global_position + Vector2(13, -6)
 	else:
 		$Fuel_Left_Label.global_position = Vector2(640, -70)
-	if Global.game_over != true:
+	if not Global.game_over:
 		if Input.is_action_just_pressed(\"show_fuel_left\"):
 			showing_fuel_bar += 1
 		if (Global.day_and_night % 2) == 0 and (showing_fuel_bar % 2) != 0:
 			$Fuel_left_AnimatedSprite2D.show()
 			$Fuel_Left_Label.show()
-			#$Show_Fuel_Left_PointLight2D.show()
+			@warning_ignore(\"integer_division\")
 			var fuel_requirement = ((Global.day_and_night+2)/2)
 			fuel_requirement = round(fuel_requirement)
 			var fuel_left = fuel_requirement - fuel
@@ -432,8 +445,6 @@ func show_fuel_left():
 		else:
 			$Fuel_Left_Label.hide()
 			$Fuel_left_AnimatedSprite2D.hide()
-	else:
-		return
 
 
 func play_panting_sound():
@@ -452,8 +463,12 @@ func play_panting_sound():
 func calculate_score_and_nights_survived():
 	if Global.day_and_night != 0:
 		if (Global.day_and_night % 2) == 0:
+			@warning_ignore(\"integer_division\")
 			nights_survived = ((Global.day_and_night+2)/2)-1
+			# ignore this, because the outcome will and can not be a float value. 
 		else:
+			@warning_ignore(\"integer_division\")
+			# ignore this, because the outcome will and can not be a float value. 
 			nights_survived = ((Global.day_and_night+1)/2)
 	else:
 		nights_survived = 0
@@ -469,18 +484,33 @@ func calculate_score_and_nights_survived():
 	
 
 func display_food_fuel_and_health_multiplayer():
-	$Health_Bar_PointLight2D.global_position = Vector2(-65, -20)
-	$Food_Bars_PointLight2D.global_position = Vector2(-65, -65)
+	$Health_Bar_PointLight2D.global_position = Vector2(-30, -20)
+	$Food_Bars_PointLight2D.global_position = Vector2(-30, -65)
 	$Show_Fuel_Left_PointLight2D.global_position = Vector2(570, -40)
 	if display_multiplayer_called:
 		return
 	else:
 		display_multiplayer_called = true
 		if (Global.day_and_night % 2) != 0: # if it is day: (when the code shouldn't run)
-			await get_tree().create_timer(30.0).timeout # in order to optimise the code, by waiting until it is night again, the code does not unnecessarily run during the day. 
-			display_multiplayer_called = false # but once back into night, this means that the code can continue to be used as normal. 
+			
+			# the following section has been moved here from process, as in process it constantly runs, unnecessarily. 
+			# here is only runs the once, and only needs to! tbis helps to optimise the code.
+			$Health_Bar_PointLight2D.hide()
+			$Food_Bars_PointLight2D.hide()
+			$Show_Fuel_Left_PointLight2D.hide()
+			$Fuel_left_AnimatedSprite2D.hide()
+			$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
+			print(\"hidden, if still visible, then this is somewhere in process running.\")
+			
+			
+			await get_tree().create_timer(30.0).timeout 
+			# in order to optimise the code, by waiting until it is night again, the code does not unnecessarily run during the day. 
+			display_multiplayer_called = false 
+			# but once back into night, this means that the code can continue to be used as normal. 
 		else:
-			$Health_Bar_PointLight2D.show() ; $Food_Bars_PointLight2D.show()
+			$Health_Bar_PointLight2D.show()
+			$Food_Bars_PointLight2D.show()
+			$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.show()
 			if health == 3:
 				$Health_Bar_PointLight2D.texture = Hearts_3
 			elif health == 2:
@@ -491,6 +521,8 @@ func display_food_fuel_and_health_multiplayer():
 				$Food_Bars_PointLight2D.texture = Food_100
 			elif food_bars == 4 or food_bars == 3 or food_bars == 2 or food_bars == 1:
 				$Food_Bars_PointLight2D.texture = Food_80
+				# this is because these all have the same dimensions, as they have the same amount of characters.
+				# this means you don't need a change between them, as 1 size fits 80-20.
 			elif food_bars == 0:
 				$Food_Bars_PointLight2D.texture = Food_CRITICAL
 			if Input.is_action_pressed(\"show_fuel_left\"):
@@ -499,8 +531,6 @@ func display_food_fuel_and_health_multiplayer():
 				else:
 					$Show_Fuel_Left_PointLight2D.hide()
 			display_multiplayer_called = false
-				
-			
 "
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lw14p"]
@@ -819,7 +849,7 @@ animation = &"3_Hearts"
 speed_scale = 2.08165e-12
 
 [node name="Score" type="Label" parent="."]
-z_index = 11
+z_index = 5
 anchors_preset = -1
 anchor_right = 0.586
 anchor_bottom = 0.565
@@ -829,7 +859,7 @@ offset_right = 184.0
 offset_bottom = 53.0
 
 [node name="Nights_survived" type="Label" parent="."]
-z_index = 11
+z_index = 5
 anchors_preset = -1
 anchor_right = 0.586
 anchor_bottom = 0.565
@@ -909,6 +939,13 @@ offset_top = -116.5
 offset_right = 224.0
 offset_bottom = -93.5
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+
+[node name="Died_from_Label" type="Label" parent="."]
+z_index = 5
+offset_left = -80.0
+offset_top = -60.0
+offset_right = -40.0
+offset_bottom = -37.0
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

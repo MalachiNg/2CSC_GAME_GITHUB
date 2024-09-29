@@ -66,8 +66,8 @@ func _process(delta):
 		critical_food()
 		getting_hungry()
 		animate_time_of_day()
-		$Food_bar_AnimatedSprite2D.global_position = Vector2(1220,-65)
-		$Health_bar_AnimatedSprite2D.global_position = Vector2(1220, -20)
+		$Food_bar_AnimatedSprite2D.global_position = Vector2(1185,-65)
+		$Health_bar_AnimatedSprite2D.global_position = Vector2(1185, -20)
 		if (Global.day_and_night % 2) == 0:
 			display_food_and_health_multiplayer()
 		else:
@@ -213,7 +213,6 @@ func display_health():
 			game_over()
 
 func game_over():
-	print(\"player 2 has run the died function\")
 	$Health_bar_AnimatedSprite2D.hide()
 	$Food_bar_AnimatedSprite2D.hide()
 	$AnimatedSprite2D.hide()
@@ -299,8 +298,8 @@ func play_panting_sound():
 		play_sound_called = false
 
 func display_food_and_health_multiplayer():
-	$Health_Bar_PointLight2D.global_position = Vector2(1220, -20)
-	$Food_Bars_PointLight2D.global_position = Vector2(1220,-65)
+	$Health_Bar_PointLight2D.global_position = Vector2(1185, -20)
+	$Food_Bars_PointLight2D.global_position = Vector2(1185,-65)
 	if display_multiplayer_called:
 		return
 	else:
@@ -327,7 +326,6 @@ func display_food_and_health_multiplayer():
 			else:
 				$Food_Bars_PointLight2D.hide()
 			display_multiplayer_called = false
-				
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6kkaa"]

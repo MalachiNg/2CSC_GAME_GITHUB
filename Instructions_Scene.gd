@@ -12,7 +12,6 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	print(page)
 	$TextureRect.show()
 	$TextureRect.size = Vector2(1152, 648)
 	if page == 1:
