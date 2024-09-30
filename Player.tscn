@@ -497,17 +497,18 @@ func show_fuel_left():
 		if Input.is_action_just_pressed(\"show_fuel_left\"):
 			showing_fuel_bar += 1
 		if (Global.day_and_night % 2) == 0 and (showing_fuel_bar % 2) != 0:
+			# if it is night and the showing_fuel_bar is odd (meaning that it should show)
 			$Fuel_left_AnimatedSprite2D.show()
 			$Fuel_Left_Label.show()
+			if not Global.single_player:
+				$Show_Fuel_Left_PointLight2D.show()
 			@warning_ignore(\"integer_division\")
 			var fuel_requirement = ((Global.day_and_night+2)/2)
 			fuel_requirement = round(fuel_requirement)
 			var fuel_left = fuel_requirement - fuel
 			$Fuel_Left_Label.text = str(fuel_left)
-		elif (Global.day_and_night % 2) == 0 and (showing_fuel_bar % 2) == 0:
-			$Fuel_left_AnimatedSprite2D.hide()
-			$Fuel_Left_Label.hide()
 		else:
+			# any other scenario, then: 
 			$Fuel_Left_Label.hide()
 			$Fuel_left_AnimatedSprite2D.hide()
 			$Show_Fuel_Left_PointLight2D.hide()
@@ -577,7 +578,7 @@ func display_food_fuel_and_health_multiplayer():
 			$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
 			
 			
-			await get_tree().create_timer(10.0).timeout 
+			await get_tree().create_timer(30.0).timeout 
 			# in order to optimise the code, by waiting until it is night again, 
 			# the code does not unnecessarily run during the day. 
 			display_multiplayer_called = false 
@@ -600,11 +601,6 @@ func display_food_fuel_and_health_multiplayer():
 				# this means you don't need a change between them, as 1 size fits 80-20.
 			elif food_bars == 0:
 				$Food_Bars_PointLight2D.texture = Food_CRITICAL
-			if Input.is_action_pressed(\"show_fuel_left\"):
-				if (showing_fuel_bar % 2) != 0:
-					$Show_Fuel_Left_PointLight2D.show()
-				else:
-					$Show_Fuel_Left_PointLight2D.hide()
 			display_multiplayer_called = false
 "
 
