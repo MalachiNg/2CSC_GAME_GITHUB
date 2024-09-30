@@ -27,7 +27,10 @@ func detect_player(area):
 	if (Global.day_and_night % 2) != 0:
 		return
 	else:
-		var fuel_requirement = ((Global.day_and_night+2)/2) # this line of code adds 2 to the day and night variable, and divides the resulting number by 2. this results in the number of nights that the character has played, including the one they are currently playing, as this code only runs during the night.
+		var fuel_requirement = ((Global.day_and_night+2)/2) 
+		# this line of code adds 2 to the day and night variable, and divides the resulting number by 2. 
+		# this results in the number of nights that the character has played, including the one they are currently playing, 
+		# as this code only runs during the night.
 		if area.is_in_group("Player"):
 			if player_fuel < fuel_requirement:
 				return

@@ -23,6 +23,9 @@ var spawned_sleeper_mobs = false
 
 
 func _ready():
+	#process_mode = Node.PROCESS_MODE_PAUSABLE
+	# this is needed for a feature that will be added, pausing the game for 4 seconds when transitioning
+	# back into night. 
 	if Global.single_player:
 		$CanvasModulate.hide()
 		#var player = player_scene.instantiate()
@@ -30,7 +33,6 @@ func _ready():
 	var reactor = reactor_scene.instantiate()
 	var fuel = fuel_scene.instantiate()
 	add_child(reactor)
-	add_child(fuel)
 	spawn_food()
 	spawn_mobs()
 	Global.update_day_and_night(0)
@@ -51,7 +53,7 @@ func _ready():
 
 func multiplayer_camera():
 	var camera = Camera2D.new()
-	camera.position = Vector2(576, 324)  # Center of the map
+	camera.position = Vector2(576, 324) # Center of the map
 	camera.zoom = Vector2(0.79, 0.79)
 	add_child(camera)
 	camera.make_current()
@@ -92,35 +94,37 @@ func spawn_food():
 	
 		
 func spawn_fuel():
-	var first_value = Global.day_and_night
-	await get_tree().create_timer(0.5).timeout
-	var second_value = Global.day_and_night
-	if first_value != second_value and (Global.day_and_night % 2) == 0 and spawned_fuel == false:
+	if (Global.day_and_night % 2) == 0 and not spawned_fuel:
 		spawned_fuel = true
 		var fuel = fuel_scene.instantiate()
 		add_child(fuel) # spawn a fuel
-	elif first_value != second_value and (Global.day_and_night % 2) != 0:
+	elif (Global.day_and_night % 2) != 0 and spawned_fuel:
 		spawned_fuel = false
 	
 
 func spawn_boss_mobs():
-	if (Global.day_and_night % 2) == 0 and spawned_boss_mobs == false: # if it is night, and this hasn't run before, then:
+	if (Global.day_and_night % 2) == 0 and not spawned_boss_mobs: 
+		# if it is night, and this hasn't run before, then:
 		spawned_boss_mobs = true # make sure it doesn't run again.
 		if (((Global.day_and_night+2)/2)%3) == 0: # check if the number of nights is a multiple of 3, if it is:
-			var boss_mob = boss_mob_scene.instantiate() #spawn a new boss mob!
+			var boss_mob = boss_mob_scene.instantiate() # spawn a new boss mob!
 			add_child(boss_mob) 
 		else: # if it isn't a multiple of three do nothing as a new boss mob only spawns into the game every 3 nights.
 			return
-	elif (Global.day_and_night % 2) != 0 and spawned_boss_mobs == true: # if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, boss mobs can spawn.
+	elif (Global.day_and_night % 2) != 0 and spawned_boss_mobs: 
+		# if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, 
+		# boss mobs can spawn.
 		spawned_boss_mobs = false
 
 func spawn_sleeper_mobs():
-	if (Global.day_and_night % 2) == 0 and spawned_sleeper_mobs == false: # if it is night, and this hasn't run before, then:
+	if (Global.day_and_night % 2) == 0 and not spawned_sleeper_mobs: # if it is night, and this hasn't run before, then:
 		spawned_sleeper_mobs = true # make sure it doesn't run again.
 		if (((Global.day_and_night+2)/2)%2) == 0: # check if the number of nights is even, if it is:
 			var sleeper_mob = sleeper_mob_scene.instantiate()
 			add_child(sleeper_mob)
-	elif (Global.day_and_night % 2) != 0 and spawned_sleeper_mobs == true: # if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, boss mobs can spawn.
+	elif (Global.day_and_night % 2) != 0 and spawned_sleeper_mobs: 
+		# if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, 
+		# boss mobs can spawn.
 		spawned_sleeper_mobs = false
 
 "

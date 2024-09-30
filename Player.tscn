@@ -23,9 +23,9 @@
 [sub_resource type="GDScript" id="GDScript_v763d"]
 resource_name = "Player.gd"
 script/source = "extends Area2D # using a 2D environment. 
-@onready var speed: float = 200 # exports \"speed\" as a variable, which can be edited in inspector. 
+@onready var speed: float = 200 
 @onready var food_bars: int = 5
-@onready var direction: Vector2 = Vector2.DOWN # as the player is constantly moving in this game.
+@onready var direction: Vector2 = Vector2.DOWN # as the starts the game, initially moving down.
 @onready var health: int = 3
 @onready var fuel: int = 0
 @onready var is_gaining_health = false
@@ -43,9 +43,12 @@ script/source = "extends Area2D # using a 2D environment.
 @onready var nights_survived : int
 @onready var ran_game_over = false
 @onready var play_sound_called = false
-@onready var Hearts_3 = preload(\"res://3_Hearts.png\") ; @onready var Hearts_2 = preload(\"res://2_Hearts.png\") ; @onready var Hearts_1 = preload(\"res://1_Heart.png\")
-@onready var Food_100 = preload(\"res://100%_food_texture.png\") ; @onready var Food_80 = preload(\"res://80%_food_texture.png\") 
-@onready var Food_CRITICAL = preload(\"res://Critical_food_texture.png\") 
+const Hearts_3 = preload(\"res://3_Hearts.png\") 
+const Hearts_2 = preload(\"res://2_Hearts.png\")
+const Hearts_1 = preload(\"res://1_Heart.png\")
+const Food_100 = preload(\"res://100%_food_texture.png\") 
+const Food_80 = preload(\"res://80%_food_texture.png\") 
+const Food_CRITICAL = preload(\"res://Critical_food_texture.png\") 
 @onready var display_multiplayer_called = false
 @onready var unmute = Global.Unmute
 @onready var died_from_starvation = false
@@ -63,7 +66,8 @@ func _ready():
 	else:
 		$Night_scene_AnimatedSprite2D.hide()
 		$Show_Fuel_Left_PointLight2D.hide()
-	$AnimatedSprite2D.play(\"move_down\") # this line of code makes the AnimatedSprite2D node play the move_down animation to match the velocity. 
+	$AnimatedSprite2D.play(\"move_down\") 
+	# this line of code makes the AnimatedSprite2D node play the move_down animation to match the velocity. 
 	$Game_over_screen_AnimatedSprite2D.hide()
 	$Score.hide()
 	$Fuel_left_AnimatedSprite2D.hide()
@@ -84,16 +88,26 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if Global.multiplayer_game_over == 2: # checks if both players have died.
-		multiplayer_game_over() # runs the multiplayer game over function.
-	if not game_over_run: # checks if player 1 has died. this line increases performace, as in multiplayer game over none of this code, besides the code to check if both players have died, which runs before this regardless of these parameters, is necessary, so is slowing the game down. Additionally, running process without these parameters would get the mobs to follow player 1 when they are dead, which is very dumb and stupid, like how much comment text i've put on this line. s
-		handle_input() #corresponds to a later function, doesn't matter the order of which functions are called, as the computer reads everything before executing it. 
-		move_and_animate(delta) # again, corresponds to a later function.
+	fuel = Global.global_fuel # ensures that the fuel is always up to date with the corresponding global fuel variable. 
+	# checks if both players have died.
+	if Global.multiplayer_game_over == 2: 
+		multiplayer_game_over() 
+		# runs the multiplayer game over function.
+	if not game_over_run: 
+		# checks if player 1 has died. this line increases performace, as in multiplayer game over none of this code, 
+		# besides the code to check if both players have died, which runs before this regardless of these parameters, 
+		# is necessary, so is slowing the game down. 
+		# Additionally, running process without these parameters would get the mobs to follow player 1 when they are dead, 
+		# which is very dumb and stupid, like how much comment text i've put on this line. s
+		handle_input() 
+		# corresponds to a later function, doesn't matter the order of which functions are called, 
+		# as the computer reads everything before executing it. 
+		move_and_animate(delta) 
+		# again, corresponds to a later function.
 		animate_time_of_day()
 		food()
 		show_fuel_left()
 		Global.update_player_position(global_position)
-		fuel = Global.global_fuel # ensures that the fuel is always up to date with the corresponding global fuel variable. 
 		gain_health()
 		display_health()
 		critical_food()
@@ -111,8 +125,10 @@ func _process(delta):
 			$Health_Bar_PointLight2D.hide()
 		if not Global.game_over:
 			elapsed_time += delta
-	elif game_over_run and not Global.game_over: # checks if player 1 has died, but player 2 in multiplayer is still alive.
-		elapsed_time += delta # then increases score as score increases even if one out of 2 players has died.
+	elif game_over_run and not Global.game_over: 
+		# checks if player 1 has died, but player 2 in multiplayer is still alive.
+		elapsed_time += delta 
+		# then increases score as score increases even if one out of 2 players has died.
 		if (Global.day_and_night % 2) == 0:
 			display_food_fuel_and_health_multiplayer()
 			show_fuel_left()
@@ -126,44 +142,77 @@ func handle_input():
 	if not Global.game_over:
 		var input_direction = Vector2.ZERO
 		if Global.single_player:
-			if Input.is_action_pressed(\"move_up\") or Input.is_action_pressed(\"move_up_2\"): # if the input action \"move_up\" as set in project settings, and is activated by w or the up key, then:
-				input_direction.y -= 1 # change the \"y\" direction by -1, setting the direction as moving up. 
-			if Input.is_action_pressed(\"move_down\") or Input.is_action_pressed(\"move_down_2\"): #same as the last one, but for input action \"move_down\". 
-				input_direction.y += 1 # change the \"y\" direction by +1 setting the direction to moving down. 
-			if Input.is_action_pressed(\"move_left\") or Input.is_action_pressed(\"move_left_2\"): # Ok I think it's clear by now...
-				input_direction.x -= 1 # change the \"x\" direction by -1, setting the direction to left. 
-			if Input.is_action_pressed(\"move_right\") or Input.is_action_pressed(\"move_right_2\"): # last one! my fingers are getting sore! yep its definitely obvious by now, I don't need to add this surely...
-				input_direction.x += 1 # and finally, change the \"x\" direction by +1, making  the direction right! :D
+			if Input.is_action_pressed(\"move_up\") or Input.is_action_pressed(\"move_up_2\"): 
+				# if the input action \"move_up\" as set in project settings, and is activated by w or the up key, then:
+				input_direction.y -= 1 
+				# change the \"y\" direction by -1, setting the direction as moving up. 
+			if Input.is_action_pressed(\"move_down\") or Input.is_action_pressed(\"move_down_2\"): 
+				# same as the last one, but for input action \"move_down\". 
+				input_direction.y += 1 
+				# change the \"y\" direction by +1 setting the direction to moving down. 
+			if Input.is_action_pressed(\"move_left\") or Input.is_action_pressed(\"move_left_2\"): 
+				# Ok I think it's clear by now...
+				input_direction.x -= 1 
+				# change the \"x\" direction by -1, setting the direction to left. 
+			if Input.is_action_pressed(\"move_right\") or Input.is_action_pressed(\"move_right_2\"): 
+				# last one! my fingers are getting sore! yep its definitely obvious by now, 
+				# I don't need to add this surely...
+				input_direction.x += 1 
+				# and finally, change the \"x\" direction by +1, making  the direction right! :D
 		else:
-			if Input.is_action_pressed(\"move_up\"): # if the input action \"move_up\" as set in project settings, and is activated by w or the up key, then:
-				input_direction.y -= 1 # change the \"y\" direction by -1, setting the direction as moving up. 
-			if Input.is_action_pressed(\"move_down\"): #same as the last one, but for input action \"move_down\". 
-				input_direction.y += 1 # change the \"y\" direction by +1 setting the direction to moving down. 
-			if Input.is_action_pressed(\"move_left\"): # Ok I think it's clear by now...
-				input_direction.x -= 1 # change the \"x\" direction by -1, setting the direction to left. 
-			if Input.is_action_pressed(\"move_right\"): # last one! my fingers are getting sore! yep its definitely obvious by now, I don't need to add this surely...
-				input_direction.x += 1 # and finally, change the \"x\" direction by +1, making  the direction right! :D
+			if Input.is_action_pressed(\"move_up\"): 
+				# if the input action \"move_up\" as set in project settings, 
+				# and is activated by w or the up key, then:
+				input_direction.y -= 1 
+				# change the \"y\" direction by -1, setting the direction as moving up. 
+			if Input.is_action_pressed(\"move_down\"): 
+				# same as the last one, but for input action \"move_down\". 
+				input_direction.y += 1 
+				# change the \"y\" direction by +1 setting the direction to moving down. 
+			if Input.is_action_pressed(\"move_left\"): 
+				# Ok I think it's clear by now...
+				input_direction.x -= 1 
+				# change the \"x\" direction by -1, setting the direction to left. 
+			if Input.is_action_pressed(\"move_right\"): 
+				# last one! my fingers are getting sore! yep its definitely obvious by now, 
+				# I don't need to add this surely...
+				input_direction.x += 1 
+				# and finally, change the \"x\" direction by +1, making  the direction right! :D
 			
 		# But wait! There's more!!!
-		if input_direction != Vector2.ZERO: # if no input is detected...
-			direction = input_direction.normalized() # ... keep the sprite moving in the same direction! :D
+		if input_direction != Vector2.ZERO: 
+			# if no input is detected...
+			direction = input_direction.normalized() 
+			# ... keep the sprite moving in the same direction! :D
 	
 
 
-func move_and_animate(delta): # the function that codes the animations. 
-	position += direction * speed * delta # the position of the sprite is equal to: The pre-existing position multiplied by the direction, so it moves the right way, the speed, so it moves the right amount, and delta, so that the speed moves in accordance to the time between frames, as opposed to the set speed at the start of the code.     
+func move_and_animate(delta): 
+	# the function that codes the animations. 
+	position += direction * speed * delta 
+	# the position of the sprite is equal to: The pre-existing position multiplied by the direction, 
+	# so it moves the right way, the speed, so it moves the right amount, and delta, \\
+	# so that the speed moves in accordance to the time between frames, as opposed to the set speed at the start of the code.     
 	position.x = clamp(position.x, 0, 1152) # these are the x co ords of the left and right side of the map.
 	position.y = clamp(position.y, 0, 648) # these are the y co ords of the top and bottom of the map.
 	# position.y/x clamp means that the player can't exit the map. 
-	if direction.x > 0: # if the x direction variable is larger than 0, indicating that the character should move along the x axis, towards the right, then:
-		if direction.y > 0: # check if y is greater than 0, which, as in many game programming platforms, (0,0) is the top left of the screen, so that the y-axis is reversed, means that the character will be moving right. As this is within the right section of the code, this means the sprite will move down right.
+	if direction.x > 0: 
+		# if the x direction variable is larger than 0, 
+		# indicating that the character should move along the x axis, towards the right, then:
+		if direction.y > 0: # check if y is greater than 0, which, as in many game programming platforms, 
+			# (0,0) is the top left of the screen, so that the y-axis is reversed, 
+			# means that the character will be moving right. As this is within the right section of the code, 
+			# this means the sprite will move down right.
 			$AnimatedSprite2D.play(\"move_down_right\") # as said before, down right.
 		elif direction.y < 0: # check to see if player is moving left. (already explained twice)
 			$AnimatedSprite2D.play(\"move_up_right\") # move it down left. (wow)
-		else: # the only other alternative is if only D is being pressed, so the character is moving only right, so only play the right animation.
+		else: # the only other alternative is if only D is being pressed, 
+			# so the character is moving only right, so only play the right animation.
 			$AnimatedSprite2D.play(\"move_right\") # so yeah move right.
 	elif direction.x < 0: # if x is less than 0 however, you should be moving left.
-		if direction.y > 0: # as mentioned, given the top left of the screen is (0,0), then y being greater than 0 means that the character is moving down. and because this is within the left section, down left.
+		if direction.y > 0: # as mentioned, given the top left of the screen is (0,0), 
+			# then y being greater than 0 means that the character is moving down. 
+			# And because this is within the left section, down left.
 			$AnimatedSprite2D.play(\"move_down_left\") # huzzah! move down left!
 		elif direction.y < 0: # y is less than zero so moving up, and then left bc of the position.
 			$AnimatedSprite2D.play(\"move_up_left\") # Huzzah again! move up left!
@@ -183,7 +232,8 @@ func animate_time_of_day():
 			if daytime_process:
 				return
 			else:
-				daytime_process = true # prevents this section from running multiple times, as it can only run the first time now. 
+				daytime_process = true # prevents this section from running multiple times, 
+				# as it can only run the first time now. 
 				$Night_scene_AnimatedSprite2D.hide() # hide the night scene sprite. 
 				daytime_process = false # resets daytime_process to false so this code can run the next day.
 	else:
@@ -194,7 +244,8 @@ func animate_time_of_day():
 func food():
 	if food_bars > 5:
 		food_bars = 5
-	elif food_bars == 5: # the variable can be between 5 and 0, each meaning food is one of 5 levels, 20% apart, respectively.
+	elif food_bars == 5: 
+		# the variable can be between 5 and 0, each meaning food is one of 5 levels, 20% apart, respectively.
 		$Food_bar_AnimatedSprite2D.play(\"100%\")
 	elif food_bars == 4:
 		$Food_bar_AnimatedSprite2D.play(\"80%\")
@@ -220,12 +271,14 @@ func critical_food():
 		else:
 			is_losing_health = true
 			$Food_bar_AnimatedSprite2D.play(\"CRITICAL!\") # this one means 0%, player starts losing health.
-			# im going to create a timer node and use that to decrease the health, with it decreasing for every few seconds with critical food. 
+			# im going to create a timer node and use that to decrease the health, 
+			# with it decreasing for every few seconds with critical food. 
 			if Global.Normal_mode:
 				await get_tree().create_timer(7.0).timeout # waits 7 seconds to decrease health at critical hunger.
 			else:
 				await get_tree().create_timer(4.0).timeout # in hard mode, health decreases at critical hunger, faster. 
-			# now im going to create a health variable which will be local, and decrease once the 7 second timer ends, so that the health slowly decreases when food is critical.
+			# now im going to create a health variable which will be local, and decrease once the 7 second timer ends, 
+			# so that the health slowly decreases when food is critical.
 			if food_bars == 0:
 				health -= 1 # decrease health by 1 every 7 seconds.
 				if health == 0:
@@ -243,23 +296,30 @@ func critical_food():
 			
 			
 func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT INCREASING DIFFICULTY OVER TIME FOR \"LEVELS\"
-	if not touched_food: # There is a timer that starts right after a food is touched, which then reduces the food_bars, if its already timing, this should be skipped. 
+	if not touched_food: # There is a timer that starts right after a food is touched, 
+		# which then reduces the food_bars, if its already timing, this should be skipped. 
 		if is_losing_hunger: # This avoids multiple runs of the code.
 			return
 		else:
 			is_losing_hunger = true
 			if Global.Normal_mode:
-				food_wait_time = (25*(1-(Global.day_and_night * 0.05))) # ok so pretty much we multiply the Global.day_and_night variable by 0.05, and subtract this from 1, and multiply the resulting number by the original number of seconds, 25. 
-			# so on the first night, this is the equation:
-			# 0 * 0.05 = 0, 1 - 0 = 1, 25 * 1 = 25, therefore food_wait_time = 25 seconds. 
-			# but on another random time, such as on the 5th day, when day_and_night = 9, 
-			# 9 * 0.05 = 0.45, 1 - 0.45 = 0.55, 25 * 0.55 = 13.75, therefore the wait time would be 13.75 seconds. 
-			# this section helps the game increase steadily in difficulty, providing an steadily increasing challenge to help excercise the user's brains!
-			# this only occurs on the normal difficulty, however, and in hard mode this happens.
+				food_wait_time = (25*(1-(Global.day_and_night * 0.05))) 
+				# ok so pretty much we multiply the Global.day_and_night variable by 0.05, 
+				# and subtract this from 1, and multiply the resulting number by the original number of seconds, 25. 
+				#
+				# so on the first night, this is the equation:
+				# 0 * 0.05 = 0, 1 - 0 = 1, 25 * 1 = 25, therefore food_wait_time = 25 seconds. 
+				# but on another random time, such as on the 5th day, when day_and_night = 9, 
+				# 9 * 0.05 = 0.45, 1 - 0.45 = 0.55, 25 * 0.55 = 13.75, therefore the wait time would be 13.75 seconds. 
+				# this section helps the game increase steadily in difficulty, 
+				# providing an steadily increasing challenge to help excercise the user's brains!
+				# this only occurs on the normal difficulty, however, and in hard mode this happens.
 			else:
-				food_wait_time = (15*(1-(Global.day_and_night * 0.08))) # a far shorter, and more quickly decreasing time to reduce hunger. 
+				food_wait_time = (15*(1-(Global.day_and_night * 0.08))) 
+				# a far shorter, and more quickly decreasing time to reduce hunger. 
 			await get_tree().create_timer(food_wait_time).timeout
-			if not touched_food: # This ensures that during the timer, the player hasn't touched a food and started a new timer.
+			if not touched_food: 
+				# This ensures that during the timer, the player hasn't touched a food and started a new timer.
 				food_bars -= 1
 				is_losing_hunger = false
 			else:
@@ -277,7 +337,6 @@ func display_health():
 		health = 3
 		$Health_bar_AnimatedSprite2D.play(\"3_Hearts\")
 	else:
-		#position.x = 0 ; position.y = 0 # prevents the player from moving, allowing game over sprites to remain still.
 		if game_over_run:
 			return
 		else:
@@ -362,10 +421,16 @@ func gain_health():
 		return
 	is_gaining_health = true
 	if Global.Normal_mode:
-		await get_tree().create_timer(30+(Global.day_and_night)).timeout # waits 30 seconds, plus 1 more second for he number of days and nights you've survived. This means that health regens on the first night every 30 seconds, then slower as the game progresses, increasing difficulty over time.
+		await get_tree().create_timer(30+(Global.day_and_night)).timeout 
+		# waits 30 seconds, plus 1 more second for he number of days and nights you've survived. 
+		# This means that health regens on the first night every 30 seconds, then slower as the game progresses, 
+		# increasing difficulty over time.
 	else:
-		await get_tree().create_timer(45+(Global.day_and_night)).timeout # if the user has selected hard mode, they regenerate health slower.
-	if health < 3 and health != 0 and food_bars != 0: # makes sure that food isn't critical, as food cannot regen at critical, also ensures health doesn't regenerate after death, and health can't be more than 3.
+		await get_tree().create_timer(45+(Global.day_and_night)).timeout 
+		# if the user has selected hard mode, they regenerate health slower.
+	if health < 3 and health != 0 and food_bars != 0: 
+		# makes sure that food isn't critical, as food cannot regen at critical, 
+		# also ensures health doesn't regenerate after death, and health can't be more than 3.
 		health += 1
 		is_gaining_health = false
 	else:
@@ -445,6 +510,7 @@ func show_fuel_left():
 		else:
 			$Fuel_Left_Label.hide()
 			$Fuel_left_AnimatedSprite2D.hide()
+			$Show_Fuel_Left_PointLight2D.hide()
 
 
 func play_panting_sound():
@@ -474,14 +540,21 @@ func calculate_score_and_nights_survived():
 		nights_survived = 0
 	
 	final_score = elapsed_time * 2 # this line of code helps prevent really low scores at the start of the game. 
-	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, then smaller, so it is more random than the time in seconds survived. 
+	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, 
+	# then smaller, so it is more random than the time in seconds survived. 
 	if nights_survived != 0:
-		final_score *= nights_survived+1 # This section increases the final score majorly, for the number of nights survived. without this, someone who ran around in circles the whole time and stayed in the first night, dying of hunger,  could get the same score as someone who played 3 nights and died from mobs. also +1 because otherwise surviving 1 night multiplies by 1 which does nothing.
+		final_score *= nights_survived+1 # This section increases the final score majorly, 
+		# for the number of nights survived. without this, 
+		# someone who ran around in circles the whole time and stayed in the first night, dying of hunger, 
+		# could get the same score as someone who played 3 nights and died from mobs. 
+		# also +1 because otherwise surviving 1 night multiplies by 1 which does nothing.
 	if not Global.Normal_mode:
 		final_score *= 1.5 
 		# if the user is on hard mode, increase the score by 50%
 	final_score = round(final_score) # and this part rounds to a integer.
-	# this entire part of code determining the score helps the score increase exponentially, which corresponds to the game's difficulty increasing exponentially, meaning a higher score for a harder part of the game played.
+	# this entire part of code determining the score helps the score increase exponentially, 
+	# which corresponds to the game's difficulty increasing exponentially, 
+	# meaning a higher score for a harder part of the game played.
 	# this means the score is a better reflection of the player's skill, than just the time they survived.
 	
 
@@ -504,8 +577,9 @@ func display_food_fuel_and_health_multiplayer():
 			$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
 			
 			
-			await get_tree().create_timer(30.0).timeout 
-			# in order to optimise the code, by waiting until it is night again, the code does not unnecessarily run during the day. 
+			await get_tree().create_timer(10.0).timeout 
+			# in order to optimise the code, by waiting until it is night again, 
+			# the code does not unnecessarily run during the day. 
 			display_multiplayer_called = false 
 			# but once back into night, this means that the code can continue to be used as normal. 
 		else:

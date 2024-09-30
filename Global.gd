@@ -12,6 +12,7 @@ var Player = preload("res://Player.tscn")
 var Normal_mode = true
 var Unmute = true
 
+
 func update_player_2_position(pos: Vector2):
 	player_2_position = pos
 
@@ -32,7 +33,7 @@ func _process(_delta):
 			return
 		else:
 			daytime_process = true 
-			await get_tree().create_timer(30.0).timeout # this times the day, after 30 seconds it times out and makes the day turn back into night.
+			await get_tree().create_timer(10.0).timeout # this times the day, after 30 seconds it times out and makes the day turn back into night.
 			if day_and_night != 0: # this patches a potential error, as when re playing the game, this timer continues, so this could cause, if the player died during the day, the night to randomly turn to day for no reason. However, since day_and_night is reset to 0 in new playthroughs from the main scene, and this code doesn't run until minimum day_and_night = 1, this small line of code patches that potential error with no possible repercussions.
 				day_and_night += 1
 				daytime_process = false
@@ -58,3 +59,10 @@ func update_normal_mode(boolean_value : bool):
 	
 func update_unmute(mute_or_unmute : bool):
 	Unmute = mute_or_unmute
+
+
+
+# FUTURE IDEA: (THANS TO ROSE :D)
+# ON GOING INTO NIGHT, PAUSE MAIN, CANCEL CAMERA ZOOM TO VIEW THE WHOLE MAP, AND DISPLAY FUEL LOCATION FOR 2 SECONDS. 
+# THEN FADE CANVASLAYER INTO EXISTENCE OF BLACKNESS, AND THEN TRANSITION INTO NIGHT, UNPAUSE MAIN. 
+# THIS MEANS THAT ITS ACTUALLY MEMORY, NOT LUCK.
