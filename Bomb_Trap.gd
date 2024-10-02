@@ -13,6 +13,7 @@ func _ready():
 	spawn_in_random_location()
 	$AnimatedSprite2D.show() # CHANGE BACK TO HIDE, THIS IS FOR DEBUGGING.
 	$CollisionShape2D.set_deferred("disabled", true)
+	$AnimatedSprite2D.play("Bomb")
 	
 	
 

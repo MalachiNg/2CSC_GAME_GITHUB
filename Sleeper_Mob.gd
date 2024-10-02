@@ -159,10 +159,12 @@ func spawn_in_random_location():
 
 
 func _on_proximity_area_2d_area_entered(area):
-	player_in_proximity = true
+	if area.is_in_group("Player"):
+		player_in_proximity = true
 
 
 
 
 func _on_proximity_area_2d_area_exited(area):
-	player_in_proximity = false
+	if area.is_in_group("Player"):
+		player_in_proximity = false

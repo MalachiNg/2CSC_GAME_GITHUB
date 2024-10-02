@@ -64,14 +64,14 @@ func _process(_delta):
 	if Global.game_over:
 		$CanvasModulate.hide()
 	else:
-		if Global.single_player == false:
+		if not Global.single_player:
 			if (Global.day_and_night % 2) == 0 and Global.game_over != true:
 				$CanvasModulate.show()
 			else:
 				$CanvasModulate.hide()
 		spawn_boss_mobs()
 		spawn_fuel()
-		if Global.Normal_mode == false:
+		if not Global.Normal_mode:
 			spawn_sleeper_mobs() # sleeper mobs are only spawned in hard mode. 
 
 func spawn_mobs():

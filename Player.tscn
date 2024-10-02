@@ -135,6 +135,7 @@ func _process(delta):
 		else:
 			$Fuel_left_AnimatedSprite2D.hide()
 			$Fuel_Left_Label.hide()
+			$Show_Fuel_Left_PointLight2D.hide()
 		$Game_Over_Back_Button.global_position = Vector2(1100,635)
 		
 
@@ -482,12 +483,15 @@ func _on_area_entered(area):
 		speed = 200
 
 
+
 func _on_game_over_back_button_pressed():
 	Global.update_game_over(false)
 	Global.update_multiplayer_game_over(0)
 	Global.update_day_and_night(0)
 	get_tree().change_scene_to_file(\"res://Start_scene.tscn\")
-	
+
+
+
 func show_fuel_left():
 	if Global.single_player:
 		$Fuel_Left_Label.global_position = $Fuel_left_AnimatedSprite2D.global_position + Vector2(13, -6)
@@ -500,7 +504,7 @@ func show_fuel_left():
 			# if it is night and the showing_fuel_bar is odd (meaning that it should show)
 			$Fuel_left_AnimatedSprite2D.show()
 			$Fuel_Left_Label.show()
-			if not Global.single_player:
+			if not Global.single_player: 
 				$Show_Fuel_Left_PointLight2D.show()
 			@warning_ignore(\"integer_division\")
 			var fuel_requirement = ((Global.day_and_night+2)/2)
@@ -567,7 +571,7 @@ func display_food_fuel_and_health_multiplayer():
 		return
 	else:
 		display_multiplayer_called = true
-		if (Global.day_and_night % 2) != 0: # if it is day: (when the code shouldn't run)
+		if (Global.day_and_night % 2) != 0: # if it is day: (when the pointlights shouldn't appear)
 			
 			# the following section has been moved here from process, as in process it constantly runs, unnecessarily. 
 			# here is only runs the once, and only needs to! tbis helps to optimise the code.

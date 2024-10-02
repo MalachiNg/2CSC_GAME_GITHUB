@@ -1,8 +1,5 @@
 extends Area2D
-#var day_or_night = Global.day_and_night
-@onready var player_fuel = Global.global_fuel
 @onready var day_night = Global.day_and_night
-@onready var new_day_night : int
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -13,8 +10,6 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	animate()
-	day_night = Global.day_and_night
-	player_fuel = Global.global_fuel
 
 
 func animate():
@@ -32,9 +27,9 @@ func detect_player(area):
 		# this results in the number of nights that the character has played, including the one they are currently playing, 
 		# as this code only runs during the night.
 		if area.is_in_group("Player"):
-			if player_fuel < fuel_requirement:
+			if Global.global_fuel < fuel_requirement:
 				return
-			elif player_fuel == fuel_requirement or player_fuel > fuel_requirement:
+			elif Global.global_fuel == fuel_requirement:
 				Global.update_fuel(0)
-				new_day_night = day_night + 1
+				var new_day_night = Global.day_and_night + 1
 				Global.update_day_and_night(new_day_night)
