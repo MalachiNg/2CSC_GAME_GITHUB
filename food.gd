@@ -19,6 +19,7 @@ extends Area2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	$AnimatedSprite2D.hide()
 	spawn_in_random_location()
 	$CollisionShape2D.set_deferred("disabled", true)
 	show_skin()

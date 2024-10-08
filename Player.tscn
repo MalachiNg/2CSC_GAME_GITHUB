@@ -84,6 +84,14 @@ func _ready():
 		$Fuel_left_AnimatedSprite2D.scale = Vector2(3, 3)
 		$Fuel_Left_Label.scale = Vector2(5, 5)
 		$Game_Over_Back_Button.scale = Vector2(0.8,0.8) 
+		# The Below section patches an error, where the following were visible in the wrong place for a fraction of a second,
+		# after the cutscene ended (in multiplayer) before process moved them where they were supposed to be.
+		# By moving them to where they are supposed to be before the cutscene, when they show afterwards, this error is prevented.
+		$Health_Bar_PointLight2D.global_position = Vector2(-30, -20) 
+		$Food_Bars_PointLight2D.global_position = Vector2(-30, -65) 
+		$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65) 
+		$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20) 
+		$Game_Over_Back_Button.global_position = Vector2(1100,635) 
 	else:
 		$Health_Bar_PointLight2D.hide()
 		$Food_Bars_PointLight2D.hide()
@@ -117,8 +125,8 @@ func _process(delta):
 		critical_food()
 		getting_hungry()
 		$AudioListener2D.global_position = global_position
-		# by default the audio is heard from player 1, regardless of single or multiplayer, however as mentioned further down, 
-		# When player 1 dies, this goes then to player 2.
+		# By default the audio is heard from player 1, regardless of single or multiplayer, however as mentioned further down, 
+		# when player 1 dies, AudioListener2D position then goes to player 2. 
 		if not Global.single_player:
 			$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
 			$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
@@ -671,6 +679,7 @@ func game_paused_false():
 		else:
 			$Food_Bars_PointLight2D.show()
 			$Health_Bar_PointLight2D.show()
+			display_food_fuel_and_health_multiplayer()
 		$AnimatedSprite2D.scale = Vector2(0.5, 0.5)
 		$AnimatedSprite2D.position = Vector2(0, 0)
 		$Food_bar_AnimatedSprite2D.show()
