@@ -5,20 +5,19 @@ extends Area2D
 @onready var max_y = 608 # max y co-ord
 @onready var hit = false
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	spawn_in_random_location()
 	$AnimatedSprite2D.show()
 	$CollisionShape2D.disabled = false
-	
-	
+	Signals.connect("game_paused_true", game_paused_true)
+	Signals.connect("game_paused_false", game_paused_false)
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	show_and_hide()
-
-
-
 
 
 func _on_area_entered(area):
@@ -27,17 +26,13 @@ func _on_area_entered(area):
 		$CollisionShape2D.set_deferred("disabled", true)
 		spawn_in_random_location()
 		hit = true
-	else:
-		return
 
 
 func show_and_hide():
 	if (Global.day_and_night % 2) == 0:
-		if hit == false:
+		if not hit:
 			$AnimatedSprite2D.show()
 			$CollisionShape2D.disabled = false
-		else:
-			return
 	else:
 		hit = false
 		$AnimatedSprite2D.hide()
@@ -49,3 +44,13 @@ func spawn_in_random_location():
 	var random_y = randf_range(min_y, max_y)
 	position = Vector2(random_x, random_y)
 
+
+func game_paused_true():
+	$PointLight2D.position = Vector2(0,0)
+	$AnimatedSprite2D.scale = Vector2(0.04, 0.04)
+	$PointLight2D.show()
+
+
+func game_paused_false():
+	$PointLight2D.hide()
+	$AnimatedSprite2D.scale = Vector2(0.01, 0.01)

@@ -46,20 +46,27 @@ const Hearts_3 = preload(\"res://3_Hearts.png\")
 const Hearts_2 = preload(\"res://2_Hearts.png\") 
 const Hearts_1 = preload(\"res://1_Heart.png\")
 @onready var unmute = Global.Unmute 
+@onready var died_from_starvation = false
+@onready var died_from_mobs = false
+@onready var died_from_traps = false
 # this fetches the value of unmute, because it can't change when player is active, 
 # so theres no point fetching it every time process wants to run panting.
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$AnimatedSprite2D.play(\"move_down\") 
+	$AnimatedSprite2D.play(\"move_down\")
 	# this line of code makes the AnimatedSprite2D node play the move_down animation to match the velocity. 
+	Signals.connect(\"game_paused_true\", game_paused_true)
+	Signals.connect(\"game_paused_false\", game_paused_false)
+	# this method of connecting does the same as in player, but is differently formatted. 
+	# i guess it shows i know different ways to code this?
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if Global.game_over != true and unmute == true:
+	if not Global.game_over and unmute:
 		play_panting_sound()
-	if game_over_run == false: 
+	if not game_over_run: 
 		# to save processing power and increase performance of the game, once the player has died, 
 		# as no code is needed from it after it's death, 
 		# due to monitoring of multiplayer game over being done in player 1's script regardless of the order of death, 
@@ -80,7 +87,8 @@ func _process(delta):
 		if (Global.day_and_night % 2) == 0:
 			display_food_and_health_multiplayer()
 		else:
-			$Food_Bars_PointLight2D.hide() ; $Health_Bar_PointLight2D.hide()
+			$Food_Bars_PointLight2D.hide() 
+			$Health_Bar_PointLight2D.hide() 
 		
 	else:
 		return
@@ -172,7 +180,7 @@ func critical_food():
 	if food_bars == 0:
 		# $Food_bar_AnimatedSprite2D.play(\"CRITICAL!\") # this one means 0%, player starts losing health. 
 		# removed as it happens later, but not called constantly, to optimise the code. 
-		if is_losing_health == true:
+		if is_losing_health:
 			return
 		else:
 			is_losing_health = true
@@ -191,6 +199,8 @@ func critical_food():
 			# and decrease once the 7 second timer ends, so that the health slowly decreases when food is critical.
 			if food_bars == 0:
 				health -= 1 # decrease health by 1 every 7 seconds .
+				if health == 0 or health < 0:
+					Global.update_player_2_died_from(1)
 				is_losing_health = false
 			else:
 				is_losing_health = false
@@ -198,7 +208,7 @@ func critical_food():
 			
 			
 func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT INCREASING DIFFICULTY OVER TIME FOR \"LEVELS\"
-	if touched_food == false: 
+	if not touched_food: 
 		# There is a timer that starts right after a food is touched, 
 		# which then reduces the food_bars, if its already timing, this should be skipped. 
 		if is_losing_hunger == true: # This avoids multiple runs of the code.
@@ -220,7 +230,7 @@ func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT IN
 				food_wait_time = (15*(1-(Global.day_and_night * 0.1))) 
 				# a far shorter, and more quickly decreasing time to reduce hunger. 
 			await get_tree().create_timer(food_wait_time).timeout
-			if touched_food == false: 
+			if not touched_food: 
 				# This ensures that during the timer, the player hasn't touched a food and started a new timer.
 				food_bars -= 1
 				is_losing_hunger = false
@@ -281,12 +291,17 @@ func gain_health():
 func _on_body_entered(body):
 	if body.is_in_group(\"Mobs\"):
 		health -= 1
+		if health == 0 or health < 0:
+			Global.update_player_2_died_from(2)
 		if unmute == true:
 			$Health_Decreased_AudioStreamPlayer.play()
 	elif body.is_in_group(\"Boss_mobs\"):
 		health -= 3
+		Global.update_player_2_died_from(2)
 	elif body.is_in_group(\"Sleeper_Mobs\"):
 		health -= 1
+		if health == 0 or health < 0:
+			Global.update_player_2_died_from(2)
 		if unmute == true:
 			$Health_Decreased_AudioStreamPlayer.play()
 
@@ -316,6 +331,8 @@ func _on_area_entered(area):
 		Global.update_fuel(fuel+1)
 	elif area.is_in_group(\"Bombs\"):
 		health -= 2
+		if health == 0 or health < 0:
+			Global.update_player_2_died_from(3)
 		speed = 100
 		await get_tree().create_timer(2.0).timeout
 		speed = 200
@@ -356,7 +373,7 @@ func display_food_and_health_multiplayer():
 	else:
 		display_multiplayer_called = true
 		if (Global.day_and_night % 2) != 0: # if it is day: (when the code shouldn't run)
-			await get_tree().create_timer(30.0).timeout 
+			await get_tree().create_timer(15.0).timeout 
 			# in order to optimise the code, by waiting until it is night again, 
 			# the code does not unnecessarily run during the day. 
 			display_multiplayer_called = false 
@@ -380,6 +397,27 @@ func display_food_and_health_multiplayer():
 			else:
 				$Food_Bars_PointLight2D.hide()
 			display_multiplayer_called = false
+
+func game_paused_true():
+	if not game_over_run:
+		$AnimatedSprite2D.scale = Vector2(3, 3)
+		$AnimatedSprite2D.position = Vector2(0, -40)
+		$Food_bar_AnimatedSprite2D.hide()
+		$Health_bar_AnimatedSprite2D.hide()
+		$Health_Bar_PointLight2D.hide()
+		$Food_Bars_PointLight2D.hide()
+		$PointLight2D.show()
+
+
+func game_paused_false():
+	if not game_over_run:
+		$AnimatedSprite2D.scale = Vector2(0.5, 0.5)
+		$AnimatedSprite2D.position = Vector2(0, 0)
+		$Food_bar_AnimatedSprite2D.show()
+		$Health_bar_AnimatedSprite2D.show()
+		$Health_Bar_PointLight2D.hide()
+		$Food_Bars_PointLight2D.show()
+		$PointLight2D.show()
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6kkaa"]
@@ -621,7 +659,7 @@ animations = [{
 
 [node name="Player" type="Area2D" groups=["Player"]]
 z_index = 3
-position = Vector2(582, 325)
+position = Vector2(662, 325)
 scale = Vector2(0.5, 0.5)
 script = SubResource("GDScript_v763d")
 

@@ -11,7 +11,8 @@ var multiplayer_game_over : int  = 0
 var Player = preload("res://Player.tscn")
 var Normal_mode = true
 var Unmute = true
-
+var player_2_died_from : int = 0
+signal daytime_over
 
 func update_player_2_position(pos: Vector2):
 	player_2_position = pos
@@ -25,16 +26,21 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame. 
 func _process(_delta):
-	# update_player_position($Player.global_position()) # instead of this, the player position is updated from the player scene. 
 	pass
 
 func daytime_process():
 	if (day_and_night % 2) != 0: # this checks if it is day, to check if the following should be run.
 		daytime_process_declarations += 1
 		var start_daytime_process_value = daytime_process_declarations
-		await get_tree().create_timer(30.0).timeout # this times the day, after 30 seconds it times out and makes the day turn back into night.
+		await get_tree().create_timer(15.0).timeout # this times the day, after 30 seconds it times out and makes the day turn back into night.
 		if daytime_process_declarations == start_daytime_process_value:
-			if day_and_night != 0: # this patches a potential error, as when re playing the game, this timer continues, so this could cause, if the player died during the day, the night to randomly turn to day for no reason. However, since day_and_night is reset to 0 in new playthroughs from the main scene, and this code doesn't run until minimum day_and_night = 1, this small line of code patches that potential error with no possible repercussions.
+			if day_and_night != 0: 
+				# this patches a potential error, as when re playing the game, this timer continues, so this could cause, 
+				# if the player died during the day, the night to randomly turn to day for no reason. 
+				# However, since day_and_night is reset to 0 in new playthroughs from the main scene, 
+				# and this code doesn't run until minimum day_and_night = 1, 
+				# this small line of code patches that potential error with no possible repercussions.
+				Signals.daytime_over.emit()
 				day_and_night += 1
 
 func update_day_and_night(new_day_or_night_value: int):
@@ -61,7 +67,8 @@ func update_normal_mode(boolean_value : bool):
 func update_unmute(mute_or_unmute : bool):
 	Unmute = mute_or_unmute
 
-
+func update_player_2_died_from(died_from : int):
+	player_2_died_from = died_from
 
 # FUTURE IDEA: (THANS TO ROSE :D)
 # ON GOING INTO NIGHT, PAUSE MAIN, CANCEL CAMERA ZOOM TO VIEW THE WHOLE MAP, AND DISPLAY FUEL LOCATION FOR 2 SECONDS. 

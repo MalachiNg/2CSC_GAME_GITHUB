@@ -20,7 +20,6 @@ func _ready():
 	 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	#print (player_pos)
 	move_to_player()
 	move_and_animate() # corresponds to a later function.
 	hide_during_day()

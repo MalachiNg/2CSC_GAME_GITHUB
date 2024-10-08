@@ -22,6 +22,8 @@ func _ready():
 	spawn_in_random_location()
 	$CollisionShape2D.set_deferred("disabled", true)
 	show_skin()
+	Signals.connect("game_paused_false", spawn_in_random_location)
+	# the above line of code makes food move to a new location when the night starts.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -37,7 +39,6 @@ func _on_area_entered(area):
 	if area.is_in_group("Player"):
 		$AnimatedSprite2D.hide()
 		$CollisionShape2D.set_deferred("disabled", true)
-		spawn_in_random_location()
 
 
 func show_and_hide():
@@ -64,4 +65,4 @@ func show_skin():
 func spawn_in_random_location():
 	var random_x = randf_range(min_x, max_x)
 	var random_y = randf_range(min_y, max_y)
-	position = Vector2(random_x, random_y)
+	global_position = Vector2(random_x, random_y)

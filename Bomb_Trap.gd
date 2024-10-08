@@ -56,7 +56,8 @@ func spawn_in_random_location():
 
 
 func _on_area_exited(area):
-	$CollisionShape2D.set_deferred("disabled", true)
-	spawn_in_random_location()
-	$AnimatedSprite2D.hide()
-	$AnimatedSprite2D.scale = Vector2(0.02,0.02)
+	if area.is_in_group("Player"):
+		$CollisionShape2D.set_deferred("disabled", true)
+		spawn_in_random_location()
+		$AnimatedSprite2D.hide()
+		$AnimatedSprite2D.scale = Vector2(0.02,0.02)

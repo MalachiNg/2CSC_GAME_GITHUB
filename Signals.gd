@@ -1,0 +1,4 @@
+extends Node
+signal game_paused_true
+signal game_paused_false
+signal daytime_over
