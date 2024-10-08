@@ -116,6 +116,9 @@ func _process(delta):
 		display_health()
 		critical_food()
 		getting_hungry()
+		$AudioListener2D.global_position = global_position
+		# by default the audio is heard from player 1, regardless of single or multiplayer, however as mentioned further down, 
+		# When player 1 dies, this goes then to player 2.
 		if not Global.single_player:
 			$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
 			$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
@@ -137,6 +140,10 @@ func _process(delta):
 			$Fuel_left_AnimatedSprite2D.hide()
 			$Fuel_Left_Label.hide()
 			$Show_Fuel_Left_PointLight2D.hide()
+		else:
+			# When Player 1 is dead, player 2 is alive, and it is night:
+			$AudioListener2D.global_position = Global.player_2_position
+			# update the audio listener to be from player 2's position.
 		$Game_Over_Back_Button.global_position = Vector2(1100,635)
 		display_food_fuel_and_health_multiplayer()
 		show_fuel_left()
@@ -1090,6 +1097,8 @@ z_index = 5
 offset_right = 40.0
 offset_bottom = 23.0
 scale = Vector2(6, 6)
+
+[node name="AudioListener2D" type="AudioListener2D" parent="."]
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
