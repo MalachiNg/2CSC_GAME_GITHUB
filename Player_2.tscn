@@ -18,7 +18,7 @@
 [sub_resource type="GDScript" id="GDScript_v763d"]
 resource_name = "Player_2.gd"
 script/source = "extends Area2D # using a 2D environment. 
-@onready var speed: float = 200 # exports \"speed\" as a variable, which can be edited in inspector. 
+@onready var speed: float = 120 # exports \"speed\" as a variable, which can be edited in inspector. 
 @onready var food_bars: int = 5
 @onready var direction: Vector2 = Vector2.DOWN # as the player is constantly moving in this game.
 @onready var health: int = 3
@@ -225,7 +225,9 @@ func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT IN
 		else:
 			is_losing_hunger = true
 			if Global.Normal_mode == true:
-				food_wait_time = (25*(1-(Global.day_and_night * 0.05))) 
+				# below, because speed of everything has decreased by 40% its only fair to make the food wiat time longer, 
+				# because it takes longer to get fuel. therefore, wait time has increased by 40% from 25 to 35.
+				food_wait_time = (35*(1-(Global.day_and_night * 0.05))) 
 				# ok so pretty much we multiply the Global.day_and_night variable by 0.05, 
 				# and subtract this from 1, and multiply the resulting number by the original number of seconds, 25. 
 				# so on the first night, this is the equation:
@@ -236,7 +238,7 @@ func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT IN
 				# providing an steadily increasing challenge to help excercise the user's brains!
 			# this only occurs on the normal difficulty, however, and in hard mode this happens.
 			else:
-				food_wait_time = (15*(1-(Global.day_and_night * 0.1))) 
+				food_wait_time = (21*(1-(Global.day_and_night * 0.1))) # same thing happened here, wait time increased by 40%.
 				# a far shorter, and more quickly decreasing time to reduce hunger. 
 			await get_tree().create_timer(food_wait_time).timeout
 			if not touched_food: 

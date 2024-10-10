@@ -1,5 +1,5 @@
 extends CharacterBody2D # using a 2D environment.
-@onready var speed: float = 20
+@onready var speed: float = 12
 @onready var target_position: Vector2 = Vector2.ZERO
 @onready var player_pos: Vector2 = Vector2.ZERO
 @onready var direction: Vector2 = Vector2.ZERO # instead of DOWN as it is in player, as the player automatically starts moving down, this is set to ZERO, so the variable only measures the direction. 

@@ -1,5 +1,6 @@
 extends CharacterBody2D # using a 2D environment.
-@onready var speed = 100 # slowed down as 150 was too difficult for players to evade, especially since speed increases. 
+@onready var speed = 60 # slowed down as 150 was too difficult for players to evade, especially since speed increases. 
+# then even further slowed down in response to feedback to make the game slower, to cater to the target demographic. 
 @onready var player_target_position: Vector2 = Vector2.ZERO
 @onready var player_2_target_position: Vector2 = Vector2.ZERO
 @onready var player_pos: Vector2 = Vector2.ZERO
@@ -168,3 +169,8 @@ func _on_proximity_area_2d_area_entered(area):
 func _on_proximity_area_2d_area_exited(area):
 	if area.is_in_group("Player"):
 		player_in_proximity = false
+
+
+
+
+# THIS IS NOT THE EXPERIMENTS ONE!!!

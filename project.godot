@@ -23,7 +23,6 @@ Signals="*res://Signals.gd"
 
 [debug]
 
-settings/stdout/print_fps=true
 shapes/enabled=true
 settings/enabled=false
 
