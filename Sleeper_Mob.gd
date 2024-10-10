@@ -1,5 +1,5 @@
 extends CharacterBody2D # using a 2D environment.
-@onready var speed = 100
+@onready var speed = 100 # slowed down as 150 was too difficult for players to evade, especially since speed increases. 
 @onready var player_target_position: Vector2 = Vector2.ZERO
 @onready var player_2_target_position: Vector2 = Vector2.ZERO
 @onready var player_pos: Vector2 = Vector2.ZERO
@@ -14,17 +14,17 @@ func _ready():
 	 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Global.game_over == true:
+	if Global.game_over:
 		$AnimatedSprite2D.hide()
 		$CollisionShape2D.set_deferred("disabled", true)
 		$Proximity_Area2D/Proximity_CollisionShape2D.set_deferred("disabled", true) # disable the proximity collisionshape.
 	else: 
 		spawn_and_despawn()
-		if player_in_proximity == true:
+		if player_in_proximity:
 			move_to_player()
 
 func move_to_player():
-	if Global.single_player == true:
+	if Global.single_player:
 		if (Global.day_and_night % 2) == 0: # ensures the mob only moves during the night.
 			player_pos = Global.player_position # and this corresponds to the other piece of code in the player.gd script, 
 			# this one accessing the position from the global script. 
@@ -107,7 +107,7 @@ func move_to_player():
 					$AnimatedSprite2D.play("move_right") # if not, move right.
 
 func spawn_and_despawn():
-	if (Global.day_and_night % 2) != 0 and despawned_tonight == false: # if it is day and this hasn't run before:
+	if (Global.day_and_night % 2) != 0 and not despawned_tonight: # if it is day and this hasn't run before:
 		despawned_tonight = true # prevents this section from running again.
 		spawned_today = false # allows the next section to run once during night.
 		$AnimatedSprite2D.hide() # hide
@@ -120,7 +120,7 @@ func spawn_and_despawn():
 		# and the start of the next calling of first_value, then:
 		# the mobs would freeze, yet still be visible and touchable. 
 		# this solves that error, without also making it less optimised. 
-	elif (Global.day_and_night % 2) == 0 and spawned_today == false:
+	elif (Global.day_and_night % 2) == 0 and not spawned_today:
 		spawned_today = true # prevents this running again.
 		despawned_tonight = false # allows the last section to run again during day.
 		$AnimatedSprite2D.show()
@@ -139,7 +139,7 @@ func spawn_in_random_location():
 	var random_y = randf_range(0, 648) # generates a random y value within the co-ordinates of the map.
 	var distance_to_player = Vector2(random_x, random_y).distance_to(Global.player_position) 
 	# finds the distance from the random mob position to the player
-	if Global.single_player == false:
+	if not Global.single_player:
 		var distance_to_player_2 = Vector2(random_x, random_y).distance_to(Global.player_2_position) # finds the distance from the random mob position to the player
 		if distance_to_player_2 < 300:
 			spawn_in_random_location()
