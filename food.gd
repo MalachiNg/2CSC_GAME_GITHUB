@@ -19,11 +19,10 @@ extends Area2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$AnimatedSprite2D.hide()
 	spawn_in_random_location()
 	$CollisionShape2D.set_deferred("disabled", true)
 	show_skin()
-	Signals.connect("game_paused_false", spawn_in_random_location)
+	Signals.connect("game_paused_true", spawn_in_random_location)
 	# the above line of code makes food move to a new location when the night starts.
 
 
@@ -44,7 +43,7 @@ func _on_area_entered(area):
 
 func show_and_hide():
 	show_at_day = Global.day_and_night
-	if (show_at_day % 2) == 1:
+	if (show_at_day % 2) != 0:
 		if spawned_today:
 			return
 		else:
@@ -64,6 +63,8 @@ func show_skin():
 
 
 func spawn_in_random_location():
+	$AnimatedSprite2D.hide() # prevents a bug where food can be visible in the cutscenes beyond the first night. 
+	# Therefore I have moved the animatedsprite2d.hide() line from ready to here, so it prevents this error every time, not just the first night.
 	var random_x = randf_range(min_x, max_x)
 	var random_y = randf_range(min_y, max_y)
 	global_position = Vector2(random_x, random_y)

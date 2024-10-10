@@ -1,5 +1,5 @@
 extends CharacterBody2D # using a 2D environment.
-@onready var speed = 150
+@onready var speed = 100
 @onready var player_target_position: Vector2 = Vector2.ZERO
 @onready var player_2_target_position: Vector2 = Vector2.ZERO
 @onready var player_pos: Vector2 = Vector2.ZERO
@@ -18,7 +18,7 @@ func _process(_delta):
 		$AnimatedSprite2D.hide()
 		$CollisionShape2D.set_deferred("disabled", true)
 		$Proximity_Area2D/Proximity_CollisionShape2D.set_deferred("disabled", true) # disable the proximity collisionshape.
-	else:
+	else: 
 		spawn_and_despawn()
 		if player_in_proximity == true:
 			move_to_player()
