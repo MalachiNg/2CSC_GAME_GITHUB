@@ -35,12 +35,6 @@ func _process(_delta):
 		show_and_hide()
 
 
-func _on_area_entered(area):
-	if area.is_in_group("Player"):
-		$AnimatedSprite2D.hide()
-		$CollisionShape2D.set_deferred("disabled", true)
-
-
 func show_and_hide():
 	show_at_day = Global.day_and_night
 	if (show_at_day % 2) != 0:
@@ -68,3 +62,16 @@ func spawn_in_random_location():
 	var random_x = randf_range(min_x, max_x)
 	var random_y = randf_range(min_y, max_y)
 	global_position = Vector2(random_x, random_y)
+
+
+func _on_body_entered(body):
+	if body.is_in_group("Player"):
+		$AnimatedSprite2D.hide()
+		$CollisionShape2D.set_deferred("disabled", true)
+
+
+
+func _on_area_entered(area):
+	if area.is_in_group("Player"):
+		$AnimatedSprite2D.hide()
+		$CollisionShape2D.set_deferred("disabled", true)

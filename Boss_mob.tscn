@@ -160,8 +160,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1oc8e"]
-radius = 142.0
-height = 284.0
+radius = 99.9995
+height = 244.898
 
 [node name="Boss_mob" type="CharacterBody2D" groups=["Boss_mobs"]]
 position = Vector2(546, 353)
@@ -177,5 +177,6 @@ animation = &"move_down"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 3)
+rotation = 1.5708
 scale = Vector2(0.07, 0.07)
 shape = SubResource("CapsuleShape2D_1oc8e")

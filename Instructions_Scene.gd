@@ -5,7 +5,8 @@ const page_2 = preload("res://INSTRUCTIONS_page_2.png")
 const page_3 = preload("res://INSTRUCTIONS_page_3.png")
 const page_4 = preload("res://INSTRUCTIONS_page_4.png")
 const page_5 = preload("res://INSTRUCTIONS_page_5.png")
-const page_6 = preload("res://INSTRUCTIONS_page_6.png")
+const page_6 = preload("res://INSTRUCTIONS_page_6.png") 
+const page_7 = preload("res://INSTRUCTIONS_page_7.png")
 
 func _ready():
 	$TextureRect.texture = preload("res://INSTRUCTIONS_page_1.png")
@@ -30,9 +31,12 @@ func _process(_delta):
 		$Back_Button.global_position = Vector2(35,-11)
 	elif page == 6:
 		$TextureRect.texture = page_6
+		$Back_Button.global_position = Vector2(0,-11)
+		$Next_Button.global_position = Vector2(950,20)
+	elif page == 7:
+		$Back_Button.global_position = Vector2(950,-11)
+		$TextureRect.texture = page_7
 		$Next_Button.hide()
-		$Back_Button.scale = Vector2(0.35,0.35)
-		$Back_Button.global_position = Vector2(970,-11)
 
 
 

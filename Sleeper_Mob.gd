@@ -172,5 +172,16 @@ func _on_proximity_area_2d_area_exited(area):
 
 
 
+func _on_proximity_area_2d_body_entered(body):
+	if body.is_in_group("Player"):
+		player_in_proximity = true
 
-# THIS IS NOT THE EXPERIMENTS ONE!!!
+
+func _on_proximity_area_2d_body_exited(body):
+	if body.is_in_group("Player"):
+		player_in_proximity = false
+
+
+# THIS IS NOT THE EXPERIMENTS ONE!
+# (btw for anyone reading, this is just telling me this is the real project, because I made a copy to test new features, 
+# in case they break the whole game)

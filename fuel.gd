@@ -20,14 +20,6 @@ func _process(_delta):
 	show_and_hide()
 
 
-func _on_area_entered(area):
-	if area.is_in_group("Player"):
-		$AnimatedSprite2D.hide()
-		$CollisionShape2D.set_deferred("disabled", true)
-		spawn_in_random_location()
-		hit = true
-
-
 func show_and_hide():
 	if (Global.day_and_night % 2) == 0:
 		if not hit:
@@ -54,3 +46,19 @@ func game_paused_true():
 func game_paused_false():
 	$PointLight2D.hide()
 	$AnimatedSprite2D.scale = Vector2(0.01, 0.01)
+
+
+func _on_body_entered(body):
+	if body.is_in_group("Player"):
+		$AnimatedSprite2D.hide()
+		$CollisionShape2D.set_deferred("disabled", true)
+		spawn_in_random_location()
+		hit = true
+
+
+func _on_area_entered(area):
+	if area.is_in_group("Player"):
+		$AnimatedSprite2D.hide()
+		$CollisionShape2D.set_deferred("disabled", true)
+		spawn_in_random_location()
+		hit = true

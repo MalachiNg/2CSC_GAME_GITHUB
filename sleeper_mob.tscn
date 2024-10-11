@@ -72,12 +72,12 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_k7ggg"]
-radius = 13.0
-height = 28.0
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_hvse6"]
 radius = 109.073
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_k7ggg"]
+radius = 8.0
+height = 24.0
 
 [node name="Sleeper_Mob" type="CharacterBody2D" groups=["Sleeper_Mobs"]]
 script = ExtResource("1_tnmaj")
@@ -88,14 +88,17 @@ scale = Vector2(0.07, 0.07)
 sprite_frames = SubResource("SpriteFrames_shfq4")
 animation = &"move_left"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 3)
-shape = SubResource("CapsuleShape2D_k7ggg")
-
 [node name="Proximity_Area2D" type="Area2D" parent="."]
 
 [node name="Proximity_CollisionShape2D" type="CollisionShape2D" parent="Proximity_Area2D"]
 shape = SubResource("CircleShape2D_hvse6")
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(2, 7)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_k7ggg")
+
 [connection signal="area_entered" from="Proximity_Area2D" to="." method="_on_proximity_area_2d_area_entered"]
 [connection signal="area_exited" from="Proximity_Area2D" to="." method="_on_proximity_area_2d_area_exited"]
+[connection signal="body_entered" from="Proximity_Area2D" to="." method="_on_proximity_area_2d_body_entered"]
+[connection signal="body_exited" from="Proximity_Area2D" to="." method="_on_proximity_area_2d_body_exited"]

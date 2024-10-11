@@ -22,7 +22,7 @@
 
 [sub_resource type="GDScript" id="GDScript_v763d"]
 resource_name = "Player.gd"
-script/source = "extends Area2D # using a 2D environment. 
+script/source = "extends CharacterBody2D # using a 2D environment. 
 @onready var speed: float = 120 
 @onready var food_bars: int = 5
 @onready var direction: Vector2 = Vector2.DOWN # as the starts the game, initially moving down.
@@ -54,9 +54,12 @@ const Food_CRITICAL = preload(\"res://Critical_food_texture.png\")
 @onready var died_from_starvation = false
 @onready var died_from_mobs = false
 @onready var died_from_traps = false
+@onready var local_position = Vector2(0, 0)
+@onready var WASD_and_arrows_control_mode = Global.WASD_and_arrows
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print(pow(3,2))
 	Signals.game_paused_true.connect(self.game_paused_true)
 	Signals.game_paused_false.connect(self.game_paused_false)
 	$Night_scene_AnimatedSprite2D.hide()
@@ -100,6 +103,7 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	calculate_score_and_nights_survived()
 	fuel = Global.global_fuel # ensures that the fuel is always up to date with the corresponding global fuel variable. 
 	# checks if both players have died.
 	if Global.multiplayer_game_over == 2: 
@@ -109,13 +113,11 @@ func _process(delta):
 		# checks if player 1 has died. this line increases performace, as in multiplayer game over none of this code, 
 		# besides the code to check if both players have died, which runs before this regardless of these parameters, 
 		# is necessary, so is slowing the game down. 
-		# Additionally, running process without these parameters would get the mobs to follow player 1 when they are dead, 
-		# which is very dumb and stupid, like how much comment text i've put on this line. s
-		handle_input() 
-		# corresponds to a later function, doesn't matter the order of which functions are called, 
-		# as the computer reads everything before executing it. 
-		move_and_animate(delta) 
-		# again, corresponds to a later function.
+		# Additionally, running process without these parameters would get the mobs to follow player 1 when they are dead.
+		if WASD_and_arrows_control_mode:
+			WASD_and_arrows_control(delta)
+		else:
+			cursor_control()
 		animate_time_of_day()
 		food()
 		show_fuel_left()
@@ -589,11 +591,14 @@ func calculate_score_and_nights_survived():
 	else:
 		nights_survived = 0
 	
+	# now to calculate score:
+	
 	final_score = elapsed_time * 2 # this line of code helps prevent really low scores at the start of the game. 
-	final_score = (final_score*final_score) / 5 # then this line makes the scores huge, 
-	# then smaller, so it is more random than the time in seconds survived. 
+	final_score = (final_score*final_score) # then this line makes the scores huge,
+	final_score /= elapsed_time * pow(0.3,nights_survived)# and this line decreases the value, so its readable, 
+	# but decreases it exponentially less, so the final score increases exponentially as the game goes on. 
 	if nights_survived != 0:
-		final_score *= nights_survived+1 # This section increases the final score majorly, 
+		final_score *= (nights_survived+1) # This section increases the final score majorly, 
 		# for the number of nights survived. without this, 
 		# someone who ran around in circles the whole time and stayed in the first night, dying of hunger, 
 		# could get the same score as someone who played 3 nights and died from mobs. 
@@ -602,6 +607,7 @@ func calculate_score_and_nights_survived():
 		final_score *= 1.5 
 		# if the user is on hard mode, increase the score by 50%
 	final_score = round(final_score) # and this part rounds to a integer.
+	print(final_score)
 	# this entire part of code determining the score helps the score increase exponentially, 
 	# which corresponds to the game's difficulty increasing exponentially, 
 	# meaning a higher score for a harder part of the game played.
@@ -687,6 +693,47 @@ func game_paused_false():
 		$Food_bar_AnimatedSprite2D.show()
 		$Health_bar_AnimatedSprite2D.show()
 		$Game_Over_Back_Button.show()
+
+
+func WASD_and_arrows_control(delta):
+	handle_input()
+	move_and_animate(delta)
+
+
+func cursor_control(): 
+	if not Global.game_over:
+		var input_direction = (get_global_mouse_position() - global_position).normalized()
+		velocity = input_direction * speed
+		move_and_slide()
+		
+		# Now for the animation section:
+		
+		global_position.x = clamp(global_position.x, 0, 1152) # these are the x co ords of the left and right side of the map.
+		global_position.y = clamp(global_position.y, 0, 648) # these are the y co ords of the top and bottom of the map.
+		var mouse_position = get_local_mouse_position()
+		var distance_to_mouse = local_position.distance_to(mouse_position)
+		# and now we have sufficient data to use the sine rules of trigenometry to find the angle to the mouse,
+		# because in-built functions fail to do so effectively. 
+		# asin() means inverse sin or sin^-1
+		var angle = rad_to_deg(asin((mouse_position.y*sin(90))/distance_to_mouse))
+		if angle < 15 and angle > -15 and mouse_position.x > 0: 
+			$AnimatedSprite2D.play(\"move_right\") 
+		elif angle < 15 and angle > -15 and mouse_position.x < 0: 
+			$AnimatedSprite2D.play(\"move_left\") 
+		elif angle < 15 and angle > -45 and mouse_position.x < 0: 
+			$AnimatedSprite2D.play(\"move_up_left\") 
+		elif angle > 15 and angle < 45 and mouse_position.x < 0: 
+			$AnimatedSprite2D.play(\"move_down_left\") 
+		elif angle < 15 and angle > -45 and mouse_position.x > 0: 
+			$AnimatedSprite2D.play(\"move_up_right\") 
+		elif angle > 15 and angle < 45 and mouse_position.x > 0: 
+			$AnimatedSprite2D.play(\"move_down_right\") 
+		elif angle < -45 and angle < -15: 
+			$AnimatedSprite2D.play(\"move_up\") 
+		elif angle > 45:
+			$AnimatedSprite2D.play(\"move_down\") 
+		else:
+			return
 "
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_lw14p"]
@@ -959,7 +1006,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Player" type="Area2D" groups=["Player"]]
+[node name="Player" type="CharacterBody2D" groups=["Player"]]
 z_index = 1
 position = Vector2(582, 325)
 scale = Vector2(0.5, 0.5)
@@ -979,7 +1026,9 @@ sprite_frames = SubResource("SpriteFrames_c30tb")
 animation = &"move_up_right"
 metadata/_edit_group_ = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D_Parent_Area2D" type="Area2D" parent="." groups=["Player"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionShape2D_Parent_Area2D"]
 position = Vector2(0, 13)
 shape = SubResource("CapsuleShape2D_lgbhs")
 metadata/_edit_group_ = true
@@ -1111,6 +1160,6 @@ scale = Vector2(6, 6)
 
 [node name="AudioListener2D" type="AudioListener2D" parent="."]
 
-[connection signal="area_entered" from="." to="." method="_on_area_entered"]
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="CollisionShape2D_Parent_Area2D" to="." method="_on_area_entered"]
+[connection signal="body_entered" from="CollisionShape2D_Parent_Area2D" to="." method="_on_body_entered"]
 [connection signal="pressed" from="Game_Over_Back_Button" to="." method="_on_game_over_back_button_pressed"]

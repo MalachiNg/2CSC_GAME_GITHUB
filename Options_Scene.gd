@@ -9,6 +9,7 @@ const Unselected_2_Players = preload("res://Unselected_2_Players.png")
 const Single_or_Multiplayer = preload("res://Single_or_Multiplayer.png")
 const Normal_or_Hard_Mode = preload("res://Normal_or_Hard_Mode.png")
 const Mute_or_Unmute = preload("res://Mute_or_Unmute.png")
+const WASD_and_arrows_or_cursor = preload("res://WASD_and_arrows_or_cursor.png")
 
 # The following are declared here, but not set to a value.
 # instead, they are set values before they appear, to spread the load out and make performance better. 
@@ -21,6 +22,10 @@ var Selected_Unmute
 var Unselected_Unmute
 var Selected_Mute
 var Unselected_Mute
+var Selected_WASD_and_arrows
+var Unselected_WASD_and_arrows
+var Selected_cursor
+var Unselected_cursor
 
 
 
@@ -30,6 +35,8 @@ func _ready():
 	$Hard_Mode_Button.hide()
 	$Mute_Button.hide() 
 	$Unmute_Button.hide()
+	$WASD_and_arrows_Button.hide()
+	$Cursor_Button.hide()
 	if Global.single_player == true:
 		Selected_Single_Player()
 	else:
@@ -50,9 +57,16 @@ func _process(_delta):
 	
 	elif page == 3:
 		$TextureRect.texture = Mute_or_Unmute
-		$Next_Button.hide()
+		if not Global.single_player:
+			$Next_Button.hide()
 		$Hard_Mode_Button.hide() ; $Normal_Mode_Button.hide()
 		mute_or_unmute()
+	elif page == 4:
+		$TextureRect.texture = WASD_and_arrows_or_cursor
+		$Next_Button.hide()
+		$Mute_Button.hide() ; $Unmute_Button.hide()
+		wasd_and_arrows_or_cursor()
+		
 
 
 
@@ -101,12 +115,20 @@ func _on_next_button_pressed():
 		unselected_Normal = preload("res://Normal_Mode_Button.png")
 		selected_Hard = preload("res://Hard_Mode_Selected.png")
 		unselected_Hard = preload("res://Hard_Mode_Button.png")
-	else:
+	elif page == 3:
 		# this runs on Mute or Unmute. the first page runs at the start so doesn't need to be in here.
 		Selected_Unmute = preload("res://Selected_Unmute.png")
 		Unselected_Unmute = preload("res://Unselected_Unmute.png")
 		Selected_Mute = preload("res://Selected_Mute.png")
 		Unselected_Mute = preload("res://Unselected_Mute.png")
+	
+	else:
+		Selected_WASD_and_arrows = preload("res://WASD_and_arrows_selected.png")
+		Unselected_WASD_and_arrows = preload("res://WASD_and_arrows_unselected.png")
+		Selected_cursor = preload("res://Cursor_selected.png")
+		Unselected_cursor = preload("res://Cursor_unselected.png")
+		
+		
 
 func normal_or_hard():
 	if Global.Normal_mode == true:
@@ -145,10 +167,34 @@ func _on_mute_button_pressed():
 	
 
 func mute_or_unmute():
-	$Mute_Button.show() ; $Unmute_Button.show()
+	$Mute_Button.show() 
+	$Unmute_Button.show()
 	if Global.Unmute == true:
 		$Mute_Button.icon = Unselected_Mute
 		$Unmute_Button.icon = Selected_Unmute
 	else:
 		$Mute_Button.icon = Selected_Mute
 		$Unmute_Button.icon = Unselected_Unmute
+
+func wasd_and_arrows_or_cursor():
+	$WASD_and_arrows_Button.show()
+	$Cursor_Button.show()
+	if Global.WASD_and_arrows:
+		$WASD_and_arrows_Button.icon = Selected_WASD_and_arrows
+		$Cursor_Button.icon = Unselected_cursor
+	else:
+		$WASD_and_arrows_Button.icon = Unselected_WASD_and_arrows
+		$Cursor_Button.icon = Selected_cursor
+
+
+
+func _on_wasd_and_arrows_button_pressed():
+	Global.update_WASD_and_arrows(true)
+	$WASD_and_arrows_Button.icon = Selected_WASD_and_arrows
+	$Cursor_Button.icon = Unselected_cursor
+
+
+func _on_cursor_button_pressed():
+	Global.update_WASD_and_arrows(false)
+	$WASD_and_arrows_Button.icon = Unselected_WASD_and_arrows
+	$Cursor_Button.icon = Selected_cursor

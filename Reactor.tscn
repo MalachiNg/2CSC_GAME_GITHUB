@@ -45,4 +45,5 @@ speed_scale = 2.08165e-12
 position = Vector2(794, 323)
 shape = SubResource("CircleShape2D_hspia")
 
-[connection signal="area_entered" from="." to="." method="detect_player"]
+[connection signal="area_entered" from="." to="." method="detect_player_2"]
+[connection signal="body_entered" from="." to="." method="detect_player_1"]

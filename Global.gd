@@ -12,6 +12,7 @@ var Player = preload("res://Player.tscn")
 var Normal_mode = true
 var Unmute = true
 var player_2_died_from : int = 0
+var WASD_and_arrows = true
 signal daytime_over
 
 func update_player_2_position(pos: Vector2):
@@ -55,6 +56,10 @@ func update_game_over(is_game_over: bool):
 	
 func update_single_player(true_or_false : bool):
 	single_player = true_or_false
+	# the following prevents an error where cursor can be used in multiplayer,
+	#  if multiplayer is selected after cursor control mode.
+	if not true_or_false:
+		update_WASD_and_arrows(true) # this sets controls to WASD and arrows in multiplayer.
 	
 func update_multiplayer_game_over(new_game_over : int):
 	multiplayer_game_over = new_game_over
@@ -74,3 +79,7 @@ func update_player_2_died_from(died_from : int):
 # ON GOING INTO NIGHT, PAUSE MAIN, CANCEL CAMERA ZOOM TO VIEW THE WHOLE MAP, AND DISPLAY FUEL LOCATION FOR 2 SECONDS. 
 # THEN FADE CANVASLAYER INTO EXISTENCE OF BLACKNESS, AND THEN TRANSITION INTO NIGHT, UNPAUSE MAIN. 
 # THIS MEANS THAT ITS ACTUALLY MEMORY, NOT LUCK.
+# This has been successfully implimented! :D
+
+func update_WASD_and_arrows(new_bool_value : bool):
+	WASD_and_arrows = new_bool_value
