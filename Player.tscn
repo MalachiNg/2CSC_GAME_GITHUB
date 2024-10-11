@@ -59,7 +59,6 @@ const Food_CRITICAL = preload(\"res://Critical_food_texture.png\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print(pow(3,2))
 	Signals.game_paused_true.connect(self.game_paused_true)
 	Signals.game_paused_false.connect(self.game_paused_false)
 	$Night_scene_AnimatedSprite2D.hide()
@@ -604,10 +603,9 @@ func calculate_score_and_nights_survived():
 		# could get the same score as someone who played 3 nights and died from mobs. 
 		# also +1 because otherwise surviving 1 night multiplies by 1 which does nothing.
 	if not Global.Normal_mode:
-		final_score *= 1.5 
-		# if the user is on hard mode, increase the score by 50%
+		final_score *= (1.5 + (nights_survived/10)
+		# if the user is on hard mode, increase the score by 50%, + an additional 10% for every ngiht survived.
 	final_score = round(final_score) # and this part rounds to a integer.
-	print(final_score)
 	# this entire part of code determining the score helps the score increase exponentially, 
 	# which corresponds to the game's difficulty increasing exponentially, 
 	# meaning a higher score for a harder part of the game played.
