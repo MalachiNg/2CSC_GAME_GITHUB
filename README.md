@@ -21,7 +21,7 @@ Please don’t steal this project and put it up somewhere else, for profit or so
 Anyway, idk really what else to put here, so here’s a cupcake recipe! (Let me know if it’s good I haven’t tried it)
 
 
-_**Vanilla Cupcakes with Buttercream Icing**__
+_**Vanilla Cupcakes with Buttercream Icing**_
 
 
 **Ingredients**
