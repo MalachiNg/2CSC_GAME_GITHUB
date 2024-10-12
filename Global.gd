@@ -13,6 +13,7 @@ var Normal_mode = true
 var Unmute = true
 var player_2_died_from : int = 0
 var WASD_and_arrows = true
+var instructions_opened = false
 signal daytime_over
 
 func update_player_2_position(pos: Vector2):
@@ -83,3 +84,8 @@ func update_player_2_died_from(died_from : int):
 
 func update_WASD_and_arrows(new_bool_value : bool):
 	WASD_and_arrows = new_bool_value
+
+
+func update_instructions_opened(): 
+	# this one doesn't get changed back to false, so doesn't need the same bool_variable : bool, instructions_opened = bool_variable thing. 
+	instructions_opened = true

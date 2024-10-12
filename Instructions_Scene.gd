@@ -10,6 +10,7 @@ const page_7 = preload("res://INSTRUCTIONS_page_7.png")
 
 func _ready():
 	$TextureRect.texture = preload("res://INSTRUCTIONS_page_1.png")
+	Global.update_instructions_opened()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
