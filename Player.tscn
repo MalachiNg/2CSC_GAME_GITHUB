@@ -392,7 +392,7 @@ func multiplayer_game_over():
 	Global.game_over = true
 	$AnimatedSprite2D.hide() ; $Food_bar_AnimatedSprite2D.hide() ; $Health_bar_AnimatedSprite2D.hide() ; 
 	$PointLight2D.color = Color.TRANSPARENT ; $Fuel_left_AnimatedSprite2D.hide() ; $Fuel_Left_Label.hide() ; 
-	$CollisionShape2D.set_deferred(\"disabled\", true)
+	$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", true)
 	$Score.show() ; $Nights_survived.show()
 	$Game_over_screen_AnimatedSprite2D.show()
 	$Game_Over_Back_Button.show()

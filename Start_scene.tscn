@@ -11,6 +11,7 @@ script/source = "extends Node
 const Main_Title = preload(\"res://Main_Title.png\")
 const Hard_Mode_Main_Title = preload(\"res://Hard_Mode_Main_Title.png\")
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	preload(\"res://Options_Scene.tscn\")
@@ -24,11 +25,13 @@ func _ready():
 	else:
 		$TextureRect.texture = Hard_Mode_Main_Title
 
+
 func _on_start_button_pressed():
 	if Global.instructions_opened:
 		get_tree().change_scene_to_file(\"res://Main.tscn\")
 	else:
 		$Go_to_instructions_Sprite2D.show()
+
 
 func _on_instructions_button_pressed():
 	get_tree().change_scene_to_file(\"res://Instructions_Scene.tscn\")

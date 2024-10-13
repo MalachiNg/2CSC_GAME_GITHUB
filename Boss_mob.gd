@@ -111,5 +111,3 @@ func spawn_in_random_location(): # this spawns the mob in a reandom location, wh
 		# then spawn there.
 
 
-# THE LARGE PART OF THE ANIMATION FUNCTION WAS REMOVED AS IT IS UNNECESSARY, 
-# AND DIDN'T FUNCTION DUE TO THE DIFFERENT TYPE OF MOVEMENT FROM PLAYER TO MOB.
