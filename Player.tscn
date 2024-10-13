@@ -718,15 +718,15 @@ func cursor_control():
 			$AnimatedSprite2D.play(\"move_right\") 
 		elif angle < 15 and angle > -15 and mouse_position.x < 0: 
 			$AnimatedSprite2D.play(\"move_left\") 
-		elif angle < 15 and angle > -45 and mouse_position.x < 0: 
+		elif angle < 15 and angle > -55 and mouse_position.x < 0: 
 			$AnimatedSprite2D.play(\"move_up_left\") 
-		elif angle > 15 and angle < 45 and mouse_position.x < 0: 
+		elif angle > 15 and angle < 55 and mouse_position.x < 0: 
 			$AnimatedSprite2D.play(\"move_down_left\") 
-		elif angle < 15 and angle > -45 and mouse_position.x > 0: 
+		elif angle < 15 and angle > -55 and mouse_position.x > 0: 
 			$AnimatedSprite2D.play(\"move_up_right\") 
-		elif angle > 15 and angle < 45 and mouse_position.x > 0: 
+		elif angle > 15 and angle < 55 and mouse_position.x > 0: 
 			$AnimatedSprite2D.play(\"move_down_right\") 
-		elif angle < -45 and angle < -15: 
+		elif angle < -55 and angle < -15: 
 			$AnimatedSprite2D.play(\"move_up\") 
 		elif angle > 45:
 			$AnimatedSprite2D.play(\"move_down\") 
