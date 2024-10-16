@@ -10,7 +10,7 @@ extends Area2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	spawn_in_random_location()
+	Signals.connect("game_paused_true", spawn_in_random_location)
 	$AnimatedSprite2D.show() # CHANGE BACK TO HIDE, THIS IS FOR DEBUGGING.
 	$CollisionShape2D.set_deferred("disabled", true)
 	$AnimatedSprite2D.play("Bomb")
@@ -42,6 +42,7 @@ func show_and_hide():
 
 
 func spawn_in_random_location():
+	$AnimatedSprite2D.hide()
 	var random_x = randf_range(min_x, max_x)
 	var random_y = randf_range(min_y, max_y)
 	position = Vector2(random_x, random_y)
@@ -56,7 +57,6 @@ func _on_body_entered(body):
 func _on_body_exited(body):
 	if body.is_in_group("Player"):
 		$CollisionShape2D.set_deferred("disabled", true)
-		spawn_in_random_location()
 		$AnimatedSprite2D.hide()
 		$AnimatedSprite2D.scale = Vector2(0.02,0.02)
 
@@ -70,6 +70,5 @@ func _on_area_entered(area):
 func _on_area_exited(area):
 	if area.is_in_group("Player"):
 		$CollisionShape2D.set_deferred("disabled", true)
-		spawn_in_random_location()
 		$AnimatedSprite2D.hide()
 		$AnimatedSprite2D.scale = Vector2(0.02,0.02)

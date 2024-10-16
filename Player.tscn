@@ -524,9 +524,9 @@ func _on_area_entered(area):
 			died_from_traps = true
 		if unmute:
 			$Health_Decreased_AudioStreamPlayer.play()
-		speed = 100
+		speed = 60
 		await get_tree().create_timer(2.0).timeout
-		speed = 200
+		speed = 120
 
 
 

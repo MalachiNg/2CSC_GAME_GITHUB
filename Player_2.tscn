@@ -344,9 +344,9 @@ func _on_area_entered(area):
 		health -= 2
 		if health == 0 or health < 0:
 			Global.update_player_2_died_from(3)
-		speed = 100
+		speed = 60
 		await get_tree().create_timer(2.0).timeout
-		speed = 200
+		speed = 120
 
 
 func _on_game_over_back_button_pressed():

@@ -16,7 +16,7 @@ extends CharacterBody2D # using a 2D environment.
 @onready var unmute = Global.Unmute
 
 func _ready():
-	spawn_in_random_location()
+	Signals.connect("game_paused_true", spawn_in_random_location)
 	if Global.Normal_mode == false:
 		speed *= 1.2 # makes the speed 20% faster if the user selects hard mode.
 	 
@@ -94,7 +94,6 @@ func spawn_and_despawn():
 		spawned_today = false # allows the next section to run once during night.
 		$AnimatedSprite2D.hide() # hide
 		$CollisionShape2D.set_deferred("disabled", true) # disable Collision Shape.
-		spawn_in_random_location()
 		# this section is put here, as variables like spawned_today mean that it isn't running always.
 		# Also, a reccurring error in the previous version of this code, where the code here was in the later section.
 		# This error meant that if the user changed to day in the time between the end of the 0.15 seconds 
@@ -109,6 +108,7 @@ func spawn_and_despawn():
 
 
 func spawn_in_random_location(): 
+	$AnimatedSprite2D.hide()
 	# this spawns the mob in a reandom location, which is no more than 200 pixels away from the player, 
 	# to keep things fair. otherwise mobs will spawn on the player and instantly kill them, which sucks!
 	var random_x = randf_range(0, 1152) # generates a random x value within the co-ordinates of the map.

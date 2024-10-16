@@ -14,7 +14,7 @@ extends CharacterBody2D # using a 2D environment.
 @onready var spawned_today = false
 
 func _ready():
-	spawn_in_random_location()
+	Signals.connect("game_paused_true", spawn_in_random_location)
 	if Global.Normal_mode == false:
 		speed *= 1.2 # makes the speed 20% faster if the user selects hard mode.
 	 
@@ -77,7 +77,6 @@ func hide_during_day():
 		spawned_today = false # allows the next section to run once during night.
 		$AnimatedSprite2D.hide() # hide
 		$CollisionShape2D.set_deferred("disabled", true) # disable Collision Shape.
-		spawn_in_random_location()
 		# this section is put here, as variables like spawned_today mean that it isn't running always.
 		# Also, a reccurring error in the previous version of this code, where the code here was in the later section.
 		# This error meant that if the user changed to day in the time between the end of the 0.15 seconds, 
