@@ -14,7 +14,7 @@ const Hard_Mode_Main_Title = preload(\"res://Hard_Mode_Main_Title.png\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	preload(\"res://Options_Scene.tscn\")
+	preload(\"res://Background.png\")
 	$Go_to_instructions_Sprite2D.hide()
 	# since this was first introduced, I hae made the options section far more optimised, and easier to load.
 	# this means preloading it is un necessary, but I am keeping it here, as there is a tiny <0.5 second lag

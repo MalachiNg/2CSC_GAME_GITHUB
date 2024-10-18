@@ -8,15 +8,16 @@
 resource_name = "Main.gd"
 script/source = "extends Node
 var player_location = Global.player_position
-var mob_scene = preload(\"res://mob.tscn\")
-var food_scene = preload(\"res://food.tscn\")
-var fuel_scene = preload(\"res://fuel.tscn\")
-var reactor_scene = preload(\"res://Reactor.tscn\")
-var player_scene = preload(\"res://Player.tscn\")
-var player_2_scene = preload(\"res://Player_2.tscn\")
-var boss_mob_scene = preload(\"res://Boss_mob.tscn\")
-var sleeper_mob_scene = preload(\"res://sleeper_mob.tscn\")
-var bomb_trap_scene = preload(\"res://bomb_trap.tscn\")
+const mob_scene = preload(\"res://mob.tscn\")
+const food_scene = preload(\"res://food.tscn\")
+const fuel_scene = preload(\"res://fuel.tscn\")
+const reactor_scene = preload(\"res://Reactor.tscn\")
+const player_scene = preload(\"res://Player.tscn\")
+const player_2_scene = preload(\"res://Player_2.tscn\")
+const boss_mob_scene = preload(\"res://Boss_mob.tscn\")
+const sleeper_mob_scene = preload(\"res://sleeper_mob.tscn\")
+const bomb_trap_scene = preload(\"res://bomb_trap.tscn\")
+const shield_scene = preload(\"res://Shield.tscn\")
 var spawned_fuel = false
 var spawned_boss_mobs = false
 var spawned_sleeper_mobs = false
@@ -33,6 +34,8 @@ func _ready():
 		#add_child(player)
 	var reactor = reactor_scene.instantiate()
 	add_child(reactor)
+	var shield = shield_scene.instantiate()
+	add_child(shield)
 	spawn_food()
 	spawn_mobs()
 	Global.update_day_and_night(0)
@@ -72,8 +75,6 @@ func _process(_delta):
 			else:
 				$CanvasModulate.hide()
 		spawn_boss_mobs()
-		if not Global.Normal_mode:
-			spawn_sleeper_mobs() # sleeper mobs are only spawned in hard mode. 
 
 func spawn_mobs():
 	for i in range(5):
@@ -109,19 +110,16 @@ func spawn_boss_mobs():
 		spawned_boss_mobs = false
 
 func spawn_sleeper_mobs():
-	if (Global.day_and_night % 2) == 0 and not spawned_sleeper_mobs: # if it is night, and this hasn't run before, then:
-		spawned_sleeper_mobs = true # make sure it doesn't run again.
-		if (((Global.day_and_night+2)/2)%2) == 0: # check if the number of nights is even, if it is:
-			var sleeper_mob = sleeper_mob_scene.instantiate()
-			add_child(sleeper_mob)
-	elif (Global.day_and_night % 2) != 0 and spawned_sleeper_mobs: 
-		# if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, 
-		# boss mobs can spawn.
-		spawned_sleeper_mobs = false
+	if (((Global.day_and_night+2)/2)%2) == 0: # check if the number of nights is even, if it is:
+		var sleeper_mob = sleeper_mob_scene.instantiate()
+		add_child(sleeper_mob)
+		print(\"sleeper mob spawned\")
 
 func pause_game():
 	var fuel = fuel_scene.instantiate()
 	add_child(fuel) # spawn a fuel
+	if not Global.Normal_mode:
+		spawn_sleeper_mobs() # sleeper mobs are only spawned in hard mode. 
 	Signals.game_paused_true.emit()
 	get_tree().paused = true
 	$Label.show()
@@ -160,10 +158,11 @@ texture = ExtResource("4_hqnie")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 visible = false
+z_index = 1
 color = Color(0, 0, 0, 1)
 
 [node name="Label" type="Label" parent="."]
-z_index = 6
+z_index = 5
 offset_left = 260.0
 offset_top = -70.0
 offset_right = 261.0
@@ -177,7 +176,7 @@ scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_uq027")
 
 [node name="Label_background_Sprite2D" type="Sprite2D" parent="."]
-z_index = 5
+z_index = 4
 position = Vector2(576, -20)
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_uq027")
