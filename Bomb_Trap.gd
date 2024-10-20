@@ -45,7 +45,15 @@ func spawn_in_random_location():
 	$AnimatedSprite2D.hide()
 	var random_x = randf_range(min_x, max_x)
 	var random_y = randf_range(min_y, max_y)
-	position = Vector2(random_x, random_y)
+	var distance_to_player = Vector2(random_x, random_y).distance_to(Global.player_position)
+	if distance_to_player < 150:
+		spawn_in_random_location()
+	if not Global.single_player:
+		var distance_to_player_2 = Vector2(random_x, random_y).distance_to(Global.player_2_position)
+		if distance_to_player_2 < 150:
+			spawn_in_random_location()
+	else:
+		position = Vector2(random_x, random_y)
 
 
 func _on_body_entered(body):

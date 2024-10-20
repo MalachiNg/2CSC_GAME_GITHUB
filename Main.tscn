@@ -162,7 +162,7 @@ z_index = 1
 color = Color(0, 0, 0, 1)
 
 [node name="Label" type="Label" parent="."]
-z_index = 5
+z_index = 6
 offset_left = 260.0
 offset_top = -70.0
 offset_right = 261.0
@@ -176,7 +176,7 @@ scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_uq027")
 
 [node name="Label_background_Sprite2D" type="Sprite2D" parent="."]
-z_index = 4
+z_index = 5
 position = Vector2(576, -20)
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_uq027")

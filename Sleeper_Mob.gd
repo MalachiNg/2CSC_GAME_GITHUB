@@ -189,6 +189,7 @@ func game_paused_true():
 	print("sleeper mob game paused true func run")
 	spawn_in_random_location()
 	$PointLight2D.show()
+	$AnimatedSprite2D.show()
 	$AnimatedSprite2D.scale = Vector2(0.15, 0.15)
 
 func game_paused_false():
