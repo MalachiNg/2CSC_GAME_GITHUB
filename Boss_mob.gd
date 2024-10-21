@@ -12,25 +12,34 @@ extends CharacterBody2D  # using a 2D environment.
 @onready var player_2_target_position = Vector2.ZERO
 @onready var despawned_tonight = false
 @onready var spawned_today = false
-
+@onready var angle : int
+@onready var single_player = Global.single_player
 
 func _ready():
 	Signals.connect("game_paused_true", spawn_in_random_location)
-	if Global.Normal_mode == false:
+	if not Global.Normal_mode:
 		speed *= 1.2  # makes the speed 20% faster if the user selects hard mode.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	move_to_player()
-	move_and_animate()  # corresponds to a later function.
+	move_and_animate() # corresponds to a later function.
 	hide_during_day()
+	player_pos = Global.player_position # updating this in process, so the whole script is always up to date. 
+	if not single_player:
+		player_2_pos = Global.player_2_position # updating this in process, so the whole script is always up to date. 
+		if global_position.distance_to(player_pos) > global_position.distance_to(player_2_pos):
+			# Closer to player 2
+			animate_moving_to_player_2()
+		else:
+			# Closer to player 1 or they have the same position:
+			animate_moving_to_player_1()
 
 
 func move_to_player():
-	if Global.single_player == true:
+	if Global.single_player:
 		if (Global.day_and_night % 2) == 0:  # ensures the mob only moves during the night.
-			player_pos = Global.player_position
 			# and this corresponds to the other piece of code in the player.gd script, this one accessing the position from the global script.
 			player_target_position = (player_pos - global_position).normalized()
 
@@ -40,9 +49,7 @@ func move_to_player():
 	else:
 		if (Global.day_and_night % 2) == 0:
 			# ensures the mob only moves during the night.
-			player_pos = Global.player_position
 			# and this corresponds to the other piece of code in the player.gd script, this one accessing the position from the global script.
-			player_2_pos = Global.player_2_position
 			# this is the same as for player 1 position, but accessing fromg Global player 2's position, as it is provided into global from player 2's process function.
 			player_target_position = (player_pos - global_position).normalized()
 			# this gets the target position for the mob to move towards player 1.
@@ -86,7 +93,7 @@ func move_and_animate():  # the function that codes the animations.
 
 
 func hide_during_day():
-	if (Global.day_and_night % 2) != 0 and despawned_tonight == false:  # if it is day and this hasn't run before:
+	if (Global.day_and_night % 2) != 0 and not despawned_tonight:  # if it is day and this hasn't run before:
 		despawned_tonight = true  # prevents this section from running again.
 		spawned_today = false  # allows the next section to run once during night.
 		$AnimatedSprite2D.hide()  # hide
@@ -97,7 +104,7 @@ func hide_during_day():
 		# and the start of the next calling of first_value, then:
 		# the mobs would freeze, yet still be visible and touchable.
 		# this solves that error, without also making it less optimised.
-	elif (Global.day_and_night % 2) == 0 and spawned_today == false:
+	elif (Global.day_and_night % 2) == 0 and not spawned_today:
 		spawned_today = true  # prevents this running again.
 		despawned_tonight = false  # allows the last section to run again during day.
 		$AnimatedSprite2D.show()
@@ -110,7 +117,7 @@ func spawn_in_random_location():  # this spawns the mob in a reandom location, w
 	var random_y = randf_range(0, 648)  # generates a random y value within the co-ordinates of the map.
 	var distance_to_player = Vector2(random_x, random_y).distance_to(Global.player_position)
 	# finds the distance from the random mob position to the player
-	if Global.single_player == false:
+	if not Global.single_player:
 		var distance_to_player_2 = Vector2(random_x, random_y).distance_to(Global.player_2_position)
 		# finds the distance from the random mob position to the player
 		if distance_to_player_2 < 150:
@@ -122,3 +129,109 @@ func spawn_in_random_location():  # this spawns the mob in a reandom location, w
 	else:
 		global_position = Vector2(random_x, random_y)  # if the random position is not less than 150 from the player,
 		# then spawn there.
+
+func animate_moving_to_player_1(): 
+		var player_position = player_pos-global_position
+		var distance_to_player = global_position.distance_to(player_pos)
+		# and now we have sufficient data to use the sine rules of trigenometry to find the angle to the mouse,
+		# because in-built functions fail to do so effectively. 
+		# asin() means inverse sin or sin^-1. 
+		angle = rad_to_deg(asin((abs(player_position.x))/distance_to_player))
+		if player_position.y > 0:
+			# DOWN
+			if player_position.x > 0:
+				# RIGHT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_down_right")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_right")
+				else:
+					$AnimatedSprite2D.play("move_down")
+			elif player_position.x < 0:
+				# LEFT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_down_left")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_left")
+				else:
+					$AnimatedSprite2D.play("move_down")
+		elif player_position.y < 0:
+			# UP
+			if player_position.x > 0:
+				# RIGHT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_up_right")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_right")
+				else:
+					$AnimatedSprite2D.play("move_up")
+			elif player_position.x < 0:
+				# LEFT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_up_left")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_left")
+				else:
+					$AnimatedSprite2D.play("move_up")
+		else:
+			# JUST LEFT OR RIGHT
+			if player_position.x > 0:
+				# RIGHT
+				$AnimatedSprite2D.play("move_right")
+			else:
+				# LEFT
+				$AnimatedSprite2D.play("move_left")
+
+
+func animate_moving_to_player_2(): 
+		var player_2_position = player_2_pos-global_position
+		var distance_to_player_2 = global_position.distance_to(player_2_pos)
+		# and now we have sufficient data to use the sine rules of trigenometry to find the angle to the mouse,
+		# because in-built functions fail to do so effectively. 
+		# asin() means inverse sin or sin^-1. 
+		angle = rad_to_deg(asin((abs(player_2_position.x))/distance_to_player_2))
+		if player_2_position.y > 0:
+			# DOWN
+			if player_2_position.x > 0:
+				# RIGHT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_down_right")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_right")
+				else:
+					$AnimatedSprite2D.play("move_down")
+			elif player_2_position.x < 0:
+				# LEFT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_down_left")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_left")
+				else:
+					$AnimatedSprite2D.play("move_down")
+		elif player_2_position.y < 0:
+			# UP
+			if player_2_position.x > 0:
+				# RIGHT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_up_right")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_right")
+				else:
+					$AnimatedSprite2D.play("move_up")
+			elif player_2_position.x < 0:
+				# LEFT
+				if angle > 15 and angle < 75:
+					$AnimatedSprite2D.play("move_up_left")
+				elif angle > 75:
+					$AnimatedSprite2D.play("move_left")
+				else:
+					$AnimatedSprite2D.play("move_up")
+		else:
+			# JUST LEFT OR RIGHT
+			if player_2_position.x > 0:
+				# RIGHT
+				$AnimatedSprite2D.play("move_right")
+			else:
+				# LEFT
+				$AnimatedSprite2D.play("move_left")
+			
