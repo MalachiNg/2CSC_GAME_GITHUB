@@ -20,13 +20,13 @@ extends CharacterBody2D  # using a 2D environment.
 
 func _ready():
 	Signals.connect("game_paused_true", spawn_in_random_location)
-	if Global.Normal_mode == false:
+	if not Global.Normal_mode:
 		speed *= 1.2  # makes the speed 20% faster if the user selects hard mode.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Global.game_over == true:
+	if Global.game_over:
 		$AnimatedSprite2D.hide()
 		$CollisionShape2D.set_deferred("disabled", true)
 	else:
@@ -51,7 +51,7 @@ func _process(_delta):
 
 
 func move_to_player():
-	if Global.single_player == true:
+	if Global.single_player:
 		if (Global.day_and_night % 2) == 0:  # ensures the mob only moves during the night.
 			# and this corresponds to the other piece of code in the player.gd script,
 			# this one accessing the position from the global script.
@@ -109,7 +109,7 @@ func move_to_player():
 
 
 func spawn_and_despawn():
-	if (Global.day_and_night % 2) != 0 and despawned_tonight == false:  # if it is day and this hasn't run before:
+	if (Global.day_and_night % 2) != 0 and not despawned_tonight:  # if it is day and this hasn't run before:
 		despawned_tonight = true  # prevents this section from running again.
 		spawned_today = false  # allows the next section to run once during night.
 		$AnimatedSprite2D.hide()  # hide
@@ -121,7 +121,7 @@ func spawn_and_despawn():
 		# and the start of the next calling of first_value, then:
 		# the mobs would freeze, yet still be visible and touchable.
 		# this solves that error, without also making it less optimised.
-	elif (Global.day_and_night % 2) == 0 and spawned_today == false:
+	elif (Global.day_and_night % 2) == 0 and not spawned_today:
 		spawned_today = true  # prevents this running again.
 		is_night = true
 		despawned_tonight = false  # allows the last section to run again during day.
@@ -139,7 +139,7 @@ func spawn_in_random_location():
 	# as previously mentioned this accesses the position directly from Global now, as during the day (when this runs) 
 	# player positions aren't updated to optimise the code, so won't be accurate. 
 	# The above finds the distance from the random mob position to the player.
-	if Global.single_player == false:
+	if not Global.single_player:
 		var distance_to_player_2 = Vector2(random_x, random_y).distance_to(Global.player_2_position)
 		# finds the distance from the random mob position to the player
 		if distance_to_player_2 < 150:
@@ -161,7 +161,7 @@ func spawn_in_random_location():
 func play_sound():
 	if sound_function_called:
 		return
-	elif sound_function_called == false and unmute == true:
+	elif sound_function_called == false and unmute:
 		sound_function_called = true
 		var interval = randf_range(2, 15)
 		await get_tree().create_timer(interval).timeout

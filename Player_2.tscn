@@ -200,13 +200,13 @@ func critical_food():
 			$Food_bar_AnimatedSprite2D.play(\"CRITICAL!\") # this one means 0%, player starts losing health.
 			# im going to create a timer node and use that to decrease the health, 
 			# with it decreasing for every few seconds with critical food. 
-			if Global.Normal_mode == true:
+			if Global.Normal_mode:
 				await get_tree().create_timer(7.0).timeout 
 				# waits 7 seconds to decrease health at critical hunger.
 			else:
 				await get_tree().create_timer(4.0).timeout 
 				# in hard mode, health decreases at critical hunger, faster. 
-			if unmute == true:
+			if unmute:
 				$Health_Decreased_AudioStreamPlayer.play()
 			# now im going to create a health variable which will be local, 
 			# and decrease once the 7 second timer ends, so that the health slowly decreases when food is critical.
@@ -224,11 +224,11 @@ func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT IN
 	if not touched_food: 
 		# There is a timer that starts right after a food is touched, 
 		# which then reduces the food_bars, if its already timing, this should be skipped. 
-		if is_losing_hunger == true: # This avoids multiple runs of the code.
+		if is_losing_hunger: # This avoids multiple runs of the code.
 			return
 		else:
 			is_losing_hunger = true
-			if Global.Normal_mode == true:
+			if Global.Normal_mode:
 				# below, because speed of everything has decreased by 40% its only fair to make the food wiat time longer, 
 				# because it takes longer to get fuel. therefore, wait time has increased by 40% from 25 to 35.
 				food_wait_time = (35*(1-(Global.day_and_night * 0.05))) 
@@ -269,7 +269,7 @@ func display_health():
 		if game_over_run:
 			return
 		else:
-			if unmute == true:
+			if unmute:
 				$Dying_AudioStreamPlayer.play()
 			game_over_run = true
 			game_over()
@@ -285,10 +285,10 @@ func game_over():
 	Global.update_multiplayer_game_over(Global.multiplayer_game_over+1)
 
 func gain_health():
-	if is_gaining_health == true:
+	if is_gaining_health:
 		return
 	is_gaining_health = true
-	if Global.Normal_mode == true:
+	if Global.Normal_mode:
 		await get_tree().create_timer(30+(Global.day_and_night)).timeout 
 		# waits 30 seconds, plus 1 more second for he number of days and nights you've survived. 
 		# This means that health regens on the first night every 30 seconds, then slower as the game progresses, 
@@ -312,7 +312,7 @@ func _on_body_entered(body):
 			$Path2D/PathFollow2D/Shield_Sprite2D.hide()
 		if health == 0 or health < 0:
 			Global.update_player_2_died_from(2)
-		if unmute == true:
+		if unmute:
 			$Health_Decreased_AudioStreamPlayer.play()
 	elif body.is_in_group(\"Boss_mobs\"):
 		if not shield_equipped:
@@ -329,7 +329,7 @@ func _on_body_entered(body):
 			$Path2D/PathFollow2D/Shield_Sprite2D.hide()
 		if health == 0 or health < 0:
 			Global.update_player_2_died_from(2)
-		if unmute == true:
+		if unmute:
 			$Health_Decreased_AudioStreamPlayer.play()
 
 func _on_area_entered(area):

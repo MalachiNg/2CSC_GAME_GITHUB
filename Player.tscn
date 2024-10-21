@@ -425,12 +425,12 @@ func multiplayer_game_over():
 		$Player_2_Died_from_Label.text = \"PLAYER 2 DIED FROM MOBS\"
 	else:
 		$Player_2_Died_from_Label.text = \"PLAYER 2 DIED FROM BOMBS\"
-	if died_from_mobs == true:
+	if died_from_mobs:
 		$Died_from_Label.text = \"PLAYER 1 DIED FROM MOBS\"
-	if died_from_starvation == true:
+	if died_from_starvation:
 		$Died_from_Label.text = \"PLAYER 1 DIED FROM STARVATION\"
 		$Died_from_Label.position.x -= 150
-	if died_from_traps == true:
+	if died_from_traps:
 		$Died_from_Label.text = \"PLAYER 1 DIED FROM BOMBS\"
 
 

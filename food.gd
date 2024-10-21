@@ -28,7 +28,7 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Global.game_over == true:
+	if Global.game_over:
 		$AnimatedSprite2D.hide()
 		$CollisionShape2D.set_deferred("disabled", true)
 	else:

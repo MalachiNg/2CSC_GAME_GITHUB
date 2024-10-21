@@ -36,7 +36,7 @@ func _ready():
 	$Unmute_Button.hide()
 	$WASD_and_arrows_Button.hide()
 	$Cursor_Button.hide()
-	if Global.single_player == true:
+	if Global.single_player:
 		Selected_Single_Player()
 	else:
 		Selected_Multiplayer()
@@ -132,7 +132,7 @@ func _on_next_button_pressed():
 
 
 func normal_or_hard():
-	if Global.Normal_mode == true:
+	if Global.Normal_mode:
 		$Normal_Mode_Button.icon = selected_Normal
 		$Hard_Mode_Button.icon = unselected_Hard
 	else:
@@ -167,7 +167,7 @@ func _on_mute_button_pressed():
 func mute_or_unmute():
 	$Mute_Button.show()
 	$Unmute_Button.show()
-	if Global.Unmute == true:
+	if Global.Unmute:
 		$Mute_Button.icon = Unselected_Mute
 		$Unmute_Button.icon = Selected_Unmute
 	else:
