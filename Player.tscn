@@ -57,6 +57,8 @@ const Food_CRITICAL = preload(\"res://Critical_food_texture.png\")
 @onready var died_from_traps = false
 @onready var local_position = Vector2(0, 0)
 @onready var WASD_and_arrows_control_mode = Global.WASD_and_arrows
+@onready var player_immune_to_mob_damage = false # the purpose of this is to ensure that mob clusters are less dangerous, 
+# and that the shape of mobs collisionshapes doesn't cause 1 hit to be 2. 
 var shield_equipped = false
 @onready var angle : int
 var path_follow: PathFollow2D
@@ -491,25 +493,26 @@ func gain_health():
 
 func _on_body_entered(body): 
 	if body.is_in_group(\"Mobs\"): 
-		if not shield_equipped:
+		if not shield_equipped and not player_immune_to_mob_damage:
 			health -= 1
 			if unmute:
 				$Health_Decreased_AudioStreamPlayer.play()
+			if health == 0:
+				# if this caused the player to die:
+				died_from_mobs = true
+			player_immune_to_mob_damage = true
+			get_tree().create_timer(1).timeout
+			player_immune_to_mob_damage = false
 		else: 
 			shield_equipped = false
 			$Path2D/PathFollow2D/Shield_Sprite2D.hide()
-		if health == 0:
-			# if this caused the player to die:
-			died_from_mobs = true
-		if unmute:
-			$Health_Decreased_AudioStreamPlayer.play()
 	elif body.is_in_group(\"Boss_mobs\"):
 		if not shield_equipped:
 			health -= 3
+			died_from_mobs = true
 		else:
 			shield_equipped = false
 			$Path2D/PathFollow2D/Shield_Sprite2D.hide()
-		died_from_mobs = true
 	elif body.is_in_group(\"Sleeper_Mobs\"):
 		if not shield_equipped:
 			health -= 1
