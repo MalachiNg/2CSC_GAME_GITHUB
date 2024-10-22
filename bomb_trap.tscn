@@ -1,8 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://76mjwbs1vujn"]
+[gd_scene load_steps=9 format=3 uid="uid://76mjwbs1vujn"]
 
 [ext_resource type="Script" path="res://Bomb_Trap.gd" id="1_h1ig2"]
 [ext_resource type="Texture2D" uid="uid://bumga2pjko0d4" path="res://Bomb.png" id="2_5udp3"]
-[ext_resource type="Texture2D" uid="uid://cihyx3xwnecdg" path="res://Explosion.png" id="3_sc0pt"]
+[ext_resource type="Texture2D" uid="uid://b5r6jm44sqiik" path="res://explosion_1.png" id="3_n6np1"]
+[ext_resource type="Texture2D" uid="uid://dew7i1t0hkfjp" path="res://explosion_3.png" id="4_ct353"]
+[ext_resource type="Texture2D" uid="uid://dvwupvwu1sjw0" path="res://explosion_2.png" id="5_klfqu"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_io6d7"]
 atlas = ExtResource("2_5udp3")
@@ -20,7 +22,13 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_sc0pt")
+"texture": ExtResource("3_n6np1")
+}, {
+"duration": 1.5,
+"texture": ExtResource("5_klfqu")
+}, {
+"duration": 1.5,
+"texture": ExtResource("4_ct353")
 }],
 "loop": true,
 "name": &"Explosion",
@@ -38,7 +46,7 @@ script = ExtResource("1_h1ig2")
 z_index = 3
 scale = Vector2(0.02, 0.02)
 sprite_frames = SubResource("SpriteFrames_y6ihr")
-animation = &"Bomb"
+animation = &"Explosion"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-2, 3)

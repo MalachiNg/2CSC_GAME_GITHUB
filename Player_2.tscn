@@ -66,6 +66,8 @@ func _ready():
 	Signals.connect(\"game_paused_false\", game_paused_false)
 	# this method of connecting does the same as in player, but is differently formatted. 
 	# i guess it shows i know different ways to code this?
+	Global.player_position = global_position # this is added, 
+	# as it is required to run before process, so that mobs spawning can function properly on the first night.
 	$Path2D/PathFollow2D/Shield_Sprite2D.hide()
 	path_follow = $Path2D/PathFollow2D
 	$Health_Bar_PointLight2D.global_position = Vector2(-30, -20)

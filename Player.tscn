@@ -68,6 +68,8 @@ var shields_picked_up = 0
 func _ready():
 	Signals.game_paused_true.connect(self.game_paused_true)
 	Signals.game_paused_false.connect(self.game_paused_false)
+	Global.player_position = global_position # this is added, 
+	# as it is required to run before process, so that mobs spawning can function properly on the first night.
 	$Night_scene_Sprite2D.hide()
 	path_follow = $Path2D/PathFollow2D
 	if single_player:

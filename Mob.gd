@@ -131,32 +131,35 @@ func spawn_and_despawn():
 
 func spawn_in_random_location():
 	$AnimatedSprite2D.hide()
+	$CollisionShape2D.set_deferred("disabled", true) # this deactivates the collisions so mob wont collide with player during this code.
 	# this spawns the mob in a reandom location, which is no more than 200 pixels away from the player,
 	# to keep things fair. otherwise mobs will spawn on the player and instantly kill them, which sucks!
 	var random_x = randf_range(0, 1152)  # generates a random x value within the co-ordinates of the map.
 	var random_y = randf_range(0, 648)  # generates a random y value within the co-ordinates of the map.
-	var distance_to_player = Vector2(random_x, random_y).distance_to(Global.player_position) 
+	var distance_to_player : float
+	var distance_to_player_2 : float
+	global_position = Vector2(random_x, random_y) # This sets the random numbers to the global position.
+	# this was not previously how the code worked, however problems aroused from using Vector2(randx, randy).distance_to(player_pos),
+	# because of position, vs global position, etc. therefore by making the random position global, no problems!
+	distance_to_player = global_position.distance_to(Global.player_position) # sets the distance to variable a value. 
 	# as previously mentioned this accesses the position directly from Global now, as during the day (when this runs) 
 	# player positions aren't updated to optimise the code, so won't be accurate. 
 	# The above finds the distance from the random mob position to the player.
-	if not Global.single_player:
-		var distance_to_player_2 = Vector2(random_x, random_y).distance_to(Global.player_2_position)
-		# finds the distance from the random mob position to the player
-		if distance_to_player_2 < 150:
-			spawn_in_random_location()
-	if distance_to_player < 150:  # if the distance to player is less than 150, then:
-		spawn_in_random_location()  # try again, this continues until the mob spawns outside of this 150 pixel radius.
-		# This prevents the game from being unfair, as if mobs can spawn really close to the player,
-		# leaving the player with no time to react, this is unfair.
-	else:
-		global_position = Vector2(random_x, random_y)
-		# if the random position is not less than 150 from the player,
-		# then spawn there.
-
-
-# THE LARGE PART OF THE ANIMATION FUNCTION WAS REMOVED AS IT IS UNNECESSARY,
-# AND DIDN'T FUNCTION DUE TO THE DiFFERENT TYPE OF MOVEMENT FROM PLAYER TO MOB.
-
+	if not Global.single_player: # runs in multiplayer: 
+		distance_to_player_2 = global_position.distance_to(Global.player_2_position) # sets distance_to_player_2 a value.
+		if distance_to_player > 200 and distance_to_player_2 > 200: # if the mobs is not in either player's 200 radius:
+			$AnimatedSprite2D.show() # then show and:
+			$CollisionShape2D.set_deferred("disabled", false) # enable the collision shape, as the mob is allowed to stay here. 
+		else: # if the mob is in the 200 radius of either player, then:
+			spawn_in_random_location() # run the code again, this will loop until the mobs spawn somewhere they are allowed to.
+			return # prevent this run of the function from continuing to run.
+	else: # if single player:
+		if distance_to_player > 200: # if the mobs aren't in the player's 200 radius:
+			$AnimatedSprite2D.show() # mob is allowed to spawn here, so show and:
+			$CollisionShape2D.set_deferred("disabled", false) # re enable collisions. 
+		else: # if the mob is in the 200 radius:
+			spawn_in_random_location() # try again. 
+			return # prevent running further, pretty pointless since theres nothing more but still!
 
 func play_sound():
 	if sound_function_called:

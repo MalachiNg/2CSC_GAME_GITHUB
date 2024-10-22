@@ -71,7 +71,7 @@ func _process(_delta):
 	else:
 		if not Global.single_player:
 			if (Global.day_and_night % 2) == 0 and Global.game_over != true:
-				$CanvasModulate.show()
+				$CanvasModulate.hide()
 			else:
 				$CanvasModulate.hide()
 		spawn_boss_mobs()
@@ -113,7 +113,6 @@ func spawn_sleeper_mobs():
 	if (((Global.day_and_night+2)/2)%2) == 0: # check if the number of nights is even, if it is:
 		var sleeper_mob = sleeper_mob_scene.instantiate()
 		add_child(sleeper_mob)
-		print(\"sleeper mob spawned\")
 
 func pause_game():
 	var fuel = fuel_scene.instantiate()
