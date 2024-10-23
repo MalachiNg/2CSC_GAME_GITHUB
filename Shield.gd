@@ -1,8 +1,4 @@
 extends Area2D
-@onready var min_x = 50  # the minimum x co-ordinate the player can be in as long as they stay in the map.
-@onready var max_x = 1052  # the maximum x co-ord
-@onready var min_y = 50  # min y co-ord
-@onready var max_y = 608  # max y co-ord
 @onready var hit = false
 
 
@@ -35,9 +31,9 @@ func show_and_hide():
 
 func spawn_in_random_location():
 	$Sprite2D.hide()
-	var random_x = randf_range(min_x, max_x)
-	var random_y = randf_range(min_y, max_y)
-	position = Vector2(random_x, random_y)
+	var random_x = randf_range(0, 1152)
+	var random_y = randf_range(0, 648)
+	global_position = Vector2(random_x, random_y)
 
 
 func _on_body_entered(body):

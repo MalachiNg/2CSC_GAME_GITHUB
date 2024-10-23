@@ -160,14 +160,12 @@ func spawn_in_random_location():
 	if not Global.single_player: # runs in multiplayer: 
 		distance_to_player_2 = global_position.distance_to(Global.player_2_position) # sets distance_to_player_2 a value.
 		if distance_to_player > 300 and distance_to_player_2 > 300: # if the mobs is not in either player's 300 radius:
-			$AnimatedSprite2D.show() # then show and:
 			$CollisionShape2D.set_deferred("disabled", false) # enable the collision shape, as the mob is allowed to stay here. 
 		else: # if the mob is in the 300 radius of either player, then:
 			spawn_in_random_location() # run the code again, this will loop until the mobs spawn somewhere they are allowed to.
 			return # prevent this run of the function from continuing to run.
 	else: # if single player:
 		if distance_to_player > 300: # if the mobs aren't in the player's 300 radius:
-			$AnimatedSprite2D.show() # mob is allowed to spawn here, so show and:
 			$CollisionShape2D.set_deferred("disabled", false) # re enable collisions. 
 		else: # if the mob is in the 300 radius:
 			spawn_in_random_location() # try again. 
@@ -182,6 +180,7 @@ func _on_proximity_area_2d_area_entered(area):
 func _on_proximity_area_2d_area_exited(area):
 	if area.is_in_group("Player"):
 		player_in_proximity = false
+		$AnimatedSprite2D.stop()
 
 
 func _on_proximity_area_2d_body_entered(body):
@@ -192,6 +191,7 @@ func _on_proximity_area_2d_body_entered(body):
 func _on_proximity_area_2d_body_exited(body):
 	if body.is_in_group("Player"):
 		player_in_proximity = false
+		$AnimatedSprite2D.stop()
 
 # THIS IS NOT THE EXPERIMENTS ONE!
 # (btw for anyone reading, this is just telling me this is the real project, because I made a copy to test new features,

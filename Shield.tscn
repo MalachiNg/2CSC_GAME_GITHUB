@@ -6,7 +6,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ftds8"]
 size = Vector2(18, 20)
 
-[node name="Area2D" type="Area2D" groups=["Shields"]]
+[node name="Shield" type="Area2D" groups=["Shields"]]
 z_index = 1
 script = ExtResource("1_f6iwu")
 

@@ -9,11 +9,6 @@ extends Area2D
 	4: "pear",
 }
 @onready var skin_num: int
-@onready var min_x = 0
-# the minimum x co-ordinate the player can be in as long as they stay in the map.
-@onready var max_x = 1152  # the maximum x co-ord
-@onready var min_y = 0  # min y co-ord
-@onready var max_y = 648  # max y co-ord
 @onready var spawned_today = false
 
 
@@ -59,8 +54,8 @@ func show_skin():
 func spawn_in_random_location():
 	$AnimatedSprite2D.hide()  # prevents a bug where food can be visible in the cutscenes beyond the first night.
 	# Therefore I have moved the animatedsprite2d.hide() line from ready to here, so it prevents this error every time, not just the first night.
-	var random_x = randf_range(min_x, max_x)
-	var random_y = randf_range(min_y, max_y)
+	var random_x = randf_range(0, 1152)
+	var random_y = randf_range(0, 648)
 	global_position = Vector2(random_x, random_y)
 
 

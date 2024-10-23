@@ -24,17 +24,18 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	move_to_player()
-	move_and_animate() # corresponds to a later function.
 	hide_during_day()
 	player_pos = Global.player_position # updating this in process, so the whole script is always up to date. 
 	if not single_player:
 		player_2_pos = Global.player_2_position # updating this in process, so the whole script is always up to date. 
-		if global_position.distance_to(player_pos) > global_position.distance_to(player_2_pos):
-			# Closer to player 2
+		if global_position.distance_to(player_pos) > global_position.distance_to(player_2_pos) and player_2_pos != Vector2(-1, -1): 
+			# Closer to player 2, and player 2 isn't dead.
 			animate_moving_to_player_2()
-		else:
+		elif global_position.distance_to(player_pos) < global_position.distance_to(player_2_pos) and player_pos != Vector2(-1, -1): 
 			# Closer to player 1 or they have the same position:
 			animate_moving_to_player_1()
+	else:
+		animate_moving_to_player_1()
 
 
 func move_to_player():
@@ -88,10 +89,6 @@ func move_to_player():
 				move_and_slide()
 
 
-func move_and_animate():  # the function that codes the animations.
-	$AnimatedSprite2D.play("move_down")
-
-
 func hide_during_day():
 	if (Global.day_and_night % 2) != 0 and not despawned_tonight:  # if it is day and this hasn't run before:
 		despawned_tonight = true  # prevents this section from running again.
@@ -131,14 +128,12 @@ func spawn_in_random_location():  # this spawns the mob in a reandom location, w
 	if not Global.single_player: # runs in multiplayer: 
 		distance_to_player_2 = global_position.distance_to(Global.player_2_position) # sets distance_to_player_2 a value.
 		if distance_to_player > 200 and distance_to_player_2 > 200: # if the mobs is not in either player's 200 radius:
-			$AnimatedSprite2D.show() # then show and:
 			$CollisionShape2D.set_deferred("disabled", false) # enable the collision shape, as the mob is allowed to stay here. 
 		else: # if the mob is in the 200 radius of either player, then:
 			spawn_in_random_location() # run the code again, this will loop until the mobs spawn somewhere they are allowed to.
 			return # prevent this run of the function from continuing to run.
 	else: # if single player:
 		if distance_to_player > 200: # if the mobs aren't in the player's 200 radius:
-			$AnimatedSprite2D.show() # mob is allowed to spawn here, so show and:
 			$CollisionShape2D.set_deferred("disabled", false) # re enable collisions. 
 		else: # if the mob is in the 200 radius:
 			spawn_in_random_location() # try again. 

@@ -1,10 +1,6 @@
 extends Area2D
 @onready var food: int
 @onready var show_at_day = Global.day_and_night
-@onready var min_x = 0 # the minimum x co-ordinate the player can be in as long as they stay in the map.
-@onready var max_x = 1152 # the maximum x co-ord
-@onready var min_y = 0 # min y co-ord
-@onready var max_y = 648 # max y co-ord
 @onready var spawned_today = false
 
 
@@ -34,6 +30,8 @@ func show_and_hide():
 		else:
 			spawned_today = true
 			$AnimatedSprite2D.show()
+			$AnimatedSprite2D.play("Bomb") # make it a bomb, not an explosion if it has blown up before.
+			$AnimatedSprite2D.stop() # stop the continuous refresh of the animation, to the same thing. (waste of processing)
 			$CollisionShape2D.set_deferred("disabled", false)
 	elif (show_at_day % 2) != 0 and spawned_today == true: # it only runs once every day:
 		$AnimatedSprite2D.hide() 
@@ -60,15 +58,13 @@ func spawn_in_random_location():
 	if not Global.single_player: # runs in multiplayer: 
 		distance_to_player_2 = global_position.distance_to(Global.player_2_position) # sets distance_to_player_2 a value.
 		if distance_to_player > 200 and distance_to_player_2 > 200: # if the mobs is not in either player's 200 radius:
-			$AnimatedSprite2D.show() # then show and:
 			$CollisionShape2D.set_deferred("disabled", false) # enable the collision shape, as the mob is allowed to stay here. 
 		else: # if the mob is in the 200 radius of either player, then:
 			spawn_in_random_location() # run the code again, this will loop until the mobs spawn somewhere they are allowed to.
 			return # prevent this run of the function from continuing to run.
 	else: # if single player:
 		if distance_to_player > 200: # if the mobs aren't in the player's 200 radius:
-			$AnimatedSprite2D.show() # mob is allowed to spawn here, so show and:
-			$CollisionShape2D.set_deferred("disabled", false) # re enable collisions. 
+			$CollisionShape2D.set_deferred("disabled", false) # mob can spawn here so re enable collisions. 
 		else: # if the mob is in the 200 radius:
 			spawn_in_random_location() # try again. 
 			return # prevent running further, pretty pointless since theres nothing more but still!
