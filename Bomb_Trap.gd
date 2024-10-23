@@ -78,7 +78,7 @@ func _on_body_entered(body):
 	if body.is_in_group("Player"):
 		$AnimatedSprite2D.scale = Vector2(0.1,0.1)
 		$AnimatedSprite2D.play("Explosion")
-		await $AnimatedSprite2D.play("Explosion").timeout
+		await get_tree().create_timer(0.7).timeout # wait for the animation to play once.
 		$AnimatedSprite2D.hide()
 		$AnimatedSprite2D.scale = Vector2(0.02,0.02)
 
@@ -91,7 +91,8 @@ func _on_body_exited(body):
 func _on_area_entered(area):
 	if area.is_in_group("Player"):
 		$AnimatedSprite2D.scale = Vector2(0.1,0.1)
-		await $AnimatedSprite2D.play("Explosion").timeout
+		$AnimatedSprite2D.play("Explosion")
+		await get_tree().create_timer(0.7).timeout # wait for the animation to play once.
 		$AnimatedSprite2D.hide()
 		$AnimatedSprite2D.scale = Vector2(0.02,0.02)
 

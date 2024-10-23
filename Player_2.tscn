@@ -316,11 +316,14 @@ func _on_body_entered(body):
 			if unmute:
 				$Health_Decreased_AudioStreamPlayer.play()
 			player_immune_to_mob_damage = true
-			get_tree().create_timer(1).timeout
+			await get_tree().create_timer(1).timeout
 			player_immune_to_mob_damage = false
 		else:
 			shield_equipped = false
 			$Path2D/PathFollow2D/Shield_Sprite2D.hide()
+			player_immune_to_mob_damage = true # player is immune to mob damage for 1 second, protecting against mob clusters.
+			await get_tree().create_timer(1).timeout
+			player_immune_to_mob_damage = false
 	elif body.is_in_group(\"Boss_mobs\"):
 		if not shield_equipped:
 			health -= 3
