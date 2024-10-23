@@ -51,7 +51,7 @@ func _process(_delta):
 
 
 func move_to_player():
-	if Global.single_player:
+	if single_player:
 		if (Global.day_and_night % 2) == 0:  # ensures the mob only moves during the night.
 			# and this corresponds to the other piece of code in the player.gd script,
 			# this one accessing the position from the global script.
@@ -145,7 +145,7 @@ func spawn_in_random_location():
 	# as previously mentioned this accesses the position directly from Global now, as during the day (when this runs) 
 	# player positions aren't updated to optimise the code, so won't be accurate. 
 	# The above finds the distance from the random mob position to the player.
-	if not Global.single_player: # runs in multiplayer: 
+	if not single_player: # runs in multiplayer: 
 		distance_to_player_2 = global_position.distance_to(Global.player_2_position) # sets distance_to_player_2 a value.
 		if distance_to_player > 200 and distance_to_player_2 > 200: # if the mobs is not in either player's 200 radius:
 			$CollisionShape2D.set_deferred("disabled", false) # enable the collision shape, as the mob is allowed to stay here. 

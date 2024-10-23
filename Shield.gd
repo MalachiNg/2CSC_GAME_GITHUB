@@ -12,6 +12,9 @@ func _ready():
 	$Sprite2D.show()
 	$CollisionShape2D.disabled = false
 	Signals.connect("game_paused_true", spawn_in_random_location)
+	if not Global.single_player:
+		$Sprite2D.scale = Vector2(0.08, 0.08)
+		$CollisionShape2D.scale = Vector2(1.3, 1.3) 
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
