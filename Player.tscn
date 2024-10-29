@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://bepxtddddmlg4"]
+[gd_scene load_steps=43 format=3 uid="uid://bepxtddddmlg4"]
 
 [ext_resource type="Texture2D" uid="uid://dos25crvsgib1" path="res://sprite.png" id="1_1bvub"]
 [ext_resource type="Texture2D" uid="uid://drl5rd4osik8i" path="res://GAME OVER.png" id="1_itl3j"]
@@ -65,6 +65,9 @@ var path_follow: PathFollow2D
 const shield_rotation_speed = 0.6
 var shields_picked_up = 0
 @onready var single_player = Global.single_player # this avoids accessing Global all the time, making the code more efficient. 
+@onready var player_respawning = false # lets cutscene code know if the player is in the process of respawning.
+@onready var player_respawning_second : int # this is used if the respawning process is interrupted by the cutscene. 
+# then after the cutscene this variable will be used to see where the countdown left off.
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -73,6 +76,9 @@ func _ready():
 	Global.player_position = global_position # this is added, 
 	# as it is required to run before process, so that mobs spawning can function properly on the first night.
 	$Night_scene_Sprite2D.hide()
+	$Respawning_PointLight2D.hide()
+	$Respawning_Label.hide()
+	$Respawning_Sprite2D.hide()
 	path_follow = $Path2D/PathFollow2D
 	if single_player:
 		$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
@@ -87,7 +93,7 @@ func _ready():
 	# this line of code makes the AnimatedSprite2D node play the move_down animation to match the velocity. 
 	$Game_over_screen_Sprite2D.hide()
 	$Score.hide()
-	$Fuel_left_AnimatedSprite2D.hide()
+	$Fuel_left_Sprite2D.hide()
 	$Fuel_Left_Label.hide()
 	$Nights_survived.hide()
 	$Path2D/PathFollow2D/Shield_Sprite2D.hide()
@@ -96,17 +102,16 @@ func _ready():
 		$Camera2D.enabled = false
 		$Food_bar_AnimatedSprite2D.scale = Vector2(0.6,0.6)
 		$Health_bar_AnimatedSprite2D.scale = Vector2(0.12,0.12)
-		$Fuel_left_AnimatedSprite2D.scale = Vector2(3, 3)
+		$Fuel_left_Sprite2D.scale = Vector2(3, 3)
 		$Fuel_Left_Label.scale = Vector2(5, 5)
 		$Game_Over_Back_Button.scale = Vector2(0.8,0.8) 
+		$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
+		$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
+		$Fuel_left_Sprite2D.global_position = Vector2(570, -40)
+		$Game_Over_Back_Button.global_position = Vector2(1100,635) 
 		# The Below section patches an error, where the following were visible in the wrong place for a fraction of a second,
 		# after the cutscene ended (in multiplayer) before process moved them where they were supposed to be.
 		# By moving them to where they are supposed to be before the cutscene, when they show afterwards, this error is prevented.
-		$Health_Bar_PointLight2D.global_position = Vector2(-30, -20) 
-		$Food_Bars_PointLight2D.global_position = Vector2(-30, -65) 
-		$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65) 
-		$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20) 
-		$Game_Over_Back_Button.global_position = Vector2(1100,635) 
 	else:
 		$Health_Bar_PointLight2D.hide()
 		$Food_Bars_PointLight2D.hide()
@@ -143,7 +148,7 @@ func _process(delta):
 		if not single_player:
 			$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
 			$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
-			$Fuel_left_AnimatedSprite2D.global_position = Vector2(570, -40)
+			$Fuel_left_Sprite2D.global_position = Vector2(570, -40)
 			$Game_Over_Back_Button.global_position = Vector2(1100,635) 
 			display_food_fuel_and_health_multiplayer()
 		elif single_player:
@@ -157,11 +162,7 @@ func _process(delta):
 		# checks if player 1 has died, but player 2 in multiplayer is still alive.
 		elapsed_time += delta 
 		# then increases score as score increases even if one out of 2 players has died.
-		if (Global.day_and_night % 2) != 0:
-			$Fuel_left_AnimatedSprite2D.hide()
-			$Fuel_Left_Label.hide()
-			$Show_Fuel_Left_PointLight2D.hide()
-		else:
+		if (Global.day_and_night % 2) == 0:
 			# When Player 1 is dead, player 2 is alive, and it is night:
 			$AudioListener2D.global_position = Global.player_2_position
 			# update the audio listener to be from player 2's position.
@@ -277,6 +278,8 @@ func animate_time_of_day():
 			$PointLight2D.show()
 		else:
 			$PointLight2D.hide()
+
+
 func food():
 	if food_bars > 5:
 		food_bars = 5
@@ -379,7 +382,7 @@ func display_health():
 		else:
 			game_over_run = true
 			if not single_player:
-				$Food_Bars_PointLight2D.energy = 0
+				$Food_Bars_PointLight2D.energy = 0 # not hide, as this will just be changed in process again!
 				$Health_Bar_PointLight2D.energy = 0
 			if unmute:
 				$Dying_AudioStreamPlayer.play()
@@ -393,16 +396,16 @@ func display_health():
 				Global.update_player_position(global_position)
 				$Food_bar_AnimatedSprite2D.hide()
 				$Health_bar_AnimatedSprite2D.hide()
-				if Global.multiplayer_game_over == 2:
-					multiplayer_game_over()
-				else:
-					return
+				if Global.multiplayer_game_over == 2: # if both plyers have died:
+					multiplayer_game_over() # Game is now over
+				else: # if not:
+					respawn_in_multiplayer() # begin the process of respawning the player!
 
 
 func multiplayer_game_over():
 	Global.game_over = true
 	$AnimatedSprite2D.hide() ; $Food_bar_AnimatedSprite2D.hide() ; $Health_bar_AnimatedSprite2D.hide() ; 
-	$PointLight2D.color = Color.TRANSPARENT ; $Fuel_left_AnimatedSprite2D.hide() ; $Fuel_Left_Label.hide() ; 
+	$PointLight2D.color = Color.TRANSPARENT ; $Fuel_left_Sprite2D.hide() ; $Fuel_Left_Label.hide() ; 
 	$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", true)
 	$Score.show() ; $Nights_survived.show()
 	$Game_over_screen_Sprite2D.show()
@@ -414,7 +417,6 @@ func multiplayer_game_over():
 	$Score.scale = Vector2(7,7) ; $Score.global_position = Vector2(430,420)
 	$Nights_survived.scale = Vector2(7,7) ; $Nights_survived.global_position = Vector2(290, 500)
 	$Game_over_screen_Sprite2D.global_position = Vector2(576, 324)
-	$Game_Over_Back_Button.set_deferred(\"disabled\", false)
 	
 	calculate_score_and_nights_survived()
 	
@@ -444,7 +446,7 @@ func game_over():
 	$Night_scene_Sprite2D.hide()
 	$Food_bar_AnimatedSprite2D.hide()
 	$Game_Over_Back_Button.position = Vector2(-230,-130)
-	$Fuel_left_AnimatedSprite2D.hide()
+	$Fuel_left_Sprite2D.hide()
 	$Fuel_Left_Label.hide()
 	
 	calculate_score_and_nights_survived()
@@ -456,7 +458,6 @@ func game_over():
 	$Nights_survived.text = \"NIGHTS SURVIVED: \" + str(nights_survived)
 	$Nights_survived.position = Vector2(-90, 50)
 	$Nights_survived.show()
-	$Game_Over_Back_Button.set_deferred(\"disabled\", false)
 	
 	$Died_from_Label.scale = Vector2(1, 1)
 	if died_from_mobs:
@@ -584,7 +585,7 @@ func _on_game_over_back_button_pressed():
 
 func show_fuel_left():
 	if single_player:
-		$Fuel_Left_Label.global_position = $Fuel_left_AnimatedSprite2D.global_position + Vector2(13, -6)
+		$Fuel_Left_Label.global_position = $Fuel_left_Sprite2D.global_position + Vector2(13, -6)
 	else:
 		$Fuel_Left_Label.global_position = Vector2(640, -70)
 	if not Global.game_over:
@@ -592,7 +593,7 @@ func show_fuel_left():
 			showing_fuel_bar += 1
 		if (Global.day_and_night % 2) == 0 and (showing_fuel_bar % 2) != 0:
 			# if it is night and the showing_fuel_bar is odd (meaning that it should show)
-			$Fuel_left_AnimatedSprite2D.show()
+			$Fuel_left_Sprite2D.show()
 			$Fuel_Left_Label.show()
 			if not single_player: 
 				$Show_Fuel_Left_PointLight2D.show()
@@ -604,7 +605,7 @@ func show_fuel_left():
 		else:
 			# any other scenario, then: 
 			$Fuel_Left_Label.hide()
-			$Fuel_left_AnimatedSprite2D.hide()
+			$Fuel_left_Sprite2D.hide()
 			$Show_Fuel_Left_PointLight2D.hide()
 
 
@@ -665,20 +666,16 @@ func display_food_fuel_and_health_multiplayer():
 		return
 	else:
 		display_multiplayer_called = true
-		if (Global.day_and_night % 2) != 0: # if it is day: (when the pointlights shouldn't appear)
+		if (Global.day_and_night % 2) != 0 and display_multiplayer_called: 
+			# if it is day: (when the pointlights shouldn't appear) and this hasn't already run:
+			# (it has already run when display_multiplayer_called is false, so this only runs when it isnt yet false,
+			# preventing more than 1 run of this code!)
 			
 			# the following section has been moved here from process, as in process it constantly runs, unnecessarily. 
 			# here is only runs the once, and only needs to! tbis helps to optimise the code.
 			$Health_Bar_PointLight2D.hide()
 			$Food_Bars_PointLight2D.hide()
-			$Show_Fuel_Left_PointLight2D.hide()
-			$Fuel_left_AnimatedSprite2D.hide()
 			$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
-			
-			
-			await get_tree().create_timer(15.0).timeout 
-			# in order to optimise the code, by waiting until it is night again, 
-			# the code does not unnecessarily run during the day. 
 			display_multiplayer_called = false 
 			# but once back into night, this means that the code can continue to be used as normal. 
 		else:
@@ -709,7 +706,7 @@ func game_paused_true():
 		$Food_Bars_PointLight2D.hide()
 		$Health_bar_AnimatedSprite2D.hide()
 		$Health_Bar_PointLight2D.hide()
-		$Fuel_left_AnimatedSprite2D.hide()
+		$Fuel_left_Sprite2D.hide()
 		$Fuel_Left_Label.hide()
 		$Show_Fuel_Left_PointLight2D.hide()
 		$PointLight2D.show()
@@ -718,6 +715,16 @@ func game_paused_true():
 		$AnimatedSprite2D.position = Vector2(0, -40)
 		$Camera2D.zoom = Vector2(0.79, 0.79)
 		$Camera2D.global_position = Vector2(576, 324) # Centre of the map
+		if player_respawning: # if the player is in the process of respawning 
+			# (a 3 second process, highly unlikley to ever happen, however there is a lot of code to sort out the issues if it ever did!)
+			$Respawning_Label.hide()
+			$Respawning_Sprite2D.hide()
+			if $Respawning_Label.text == \"Respawning in 3...\": 
+				player_respawning_second = 3
+			elif $Respawning_Label.text == \"Respawning in 2...\": 
+				player_respawning_second = 2
+			else: 
+				player_respawning_second = 1
 
 
 func game_paused_false():
@@ -736,7 +743,35 @@ func game_paused_false():
 		$Food_bar_AnimatedSprite2D.show()
 		$Health_bar_AnimatedSprite2D.show()
 		$Game_Over_Back_Button.show()
-
+		if player_respawning_second != 0: # this will only happen if the player is in the process of respawning in the cutscene.
+			# not using the player_respawning because that is changed back to false during the cutscene, should this be run then, meaning it can't be used.
+			# this entire block of code is very unlikely to be used much, however it prevents some major issues if respawning happened during the cutscene.
+			$Respawning_PointLight2D.show() # show the pointlight, so the label can be seen after the cutscene.
+			$Respawning_Label.show()
+			$Respawning_Sprite2D.show()
+			Global.update_multiplayer_game_over(1) # this will have changed during the cutscene, bring it back so they don't respawn.
+			game_over_run = true # this too.
+			if player_respawning_second == 1:
+				$Respawning_Label.text = \"Respawning in 1...\"
+				await get_tree().create_timer(1).timeout
+			elif player_respawning_second == 2:
+				$Respawning_Label.text = \"Respawning in 2...\"
+				await get_tree().create_timer(1).timeout
+				$Respawning_Label.text = \"Respawning in 1...\"
+				await get_tree().create_timer(1).timeout
+			else: # the only other case is == 3:
+				$Respawning_Label.text = \"Respawning in 3...\"
+				await get_tree().create_timer(1).timeout
+				$Respawning_Label.text = \"Respawning in 2...\"
+				await get_tree().create_timer(1).timeout
+				$Respawning_Label.text = \"Respawning in 1...\"
+				await get_tree().create_timer(1).timeout
+			Global.update_multiplayer_game_over(0) # this runs after the timers above have finished:
+			game_over_run = false # now the player can respawn
+			$PointLight2D.show() # shows pointlight, no need to check for multiplayer or night bc otherwise this wouldn't run! 
+			$AnimatedSprite2D.show()
+			$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false)
+			player_respawning_second = 0 # this shows the next runs of the game_paused_false that this needn't be run.
 
 func WASD_and_arrows_control(delta):
 	handle_input()
@@ -785,10 +820,88 @@ func display_shield(delta):
 		path_follow.progress += shield_rotation_speed * path_follow.get_parent().curve.get_baked_length() * delta
 		# reset the rotation when the loop is done:
 		if path_follow.progress >= path_follow.get_parent().curve.get_baked_length():
-				path_follow.progress= 0
+				path_follow.progress = 0
 		
 		# Ensure the shield doesn't spin, when rotating:
 		$Path2D/PathFollow2D/Shield_Sprite2D.global_rotation = 0
+
+func respawn_in_multiplayer(): # this function allows the player to respawn, 
+	# making the game more fun, as otherwise, one you die, its just boring!
+	await get_tree().create_timer(57).timeout # the player remains dead for 60 seconds (otherwise there's no incentive to stay alive).
+	# it is only 57 here because the last 3 are in the below countdown.
+	global_position = Vector2(576, 324)
+	player_respawning = true # the respawn process is starting!
+	$Fuel_left_Sprite2D.global_position = Vector2(570, -40) # this is required as the position wasn't updated 
+	if Global.multiplayer_game_over != 2: # if both players haven't died:
+		$Respawning_Label.global_position = Vector2(405, 290) # change the position before showing so it shows in the correct place.
+		$Respawning_PointLight2D.global_position = Vector2(576, 324)
+		$Respawning_Sprite2D.global_position = Vector2(576, 324)
+		if not get_tree().paused: # if the cutscene isn't currently happening:
+			if (Global.day_and_night % 2) == 0: # if it is night:
+				$Respawning_PointLight2D.show() # show the pointlight so this is visible.
+			$Respawning_Label.show() # The others are shown only during the day
+			$Respawning_Sprite2D.show()
+		$Respawning_Label.text = \"Respawning in 3…\"
+		await get_tree().create_timer(1).timeout
+		$Respawning_Label.text = \"Respawning in 2…\"
+		await get_tree().create_timer(1).timeout
+		$Respawning_Label.text = \"Respawning in 1…\"
+		await get_tree().create_timer(1).timeout
+		# Time for the respawning code:
+		Global.update_multiplayer_game_over(0) # resets the multiplayer game over value in global.
+		game_over_run = false # sets game over run as false, making a whole load of things run again!
+		health = 3 # resets health, and
+		food_bars = 5 # also food stats to full! 
+		$Respawning_Label.hide()
+		$Respawning_PointLight2D.hide()
+		$Respawning_Sprite2D.hide()
+		if died_from_mobs:
+			died_from_mobs = false
+		elif died_from_starvation:
+			died_from_starvation = false
+		else:
+			died_from_traps = false # reset what the player has died from, so it shows accurately when the game is truly over.
+		if not get_tree().paused: # if this is not running during a cutscene:
+			$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
+			$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
+			$Fuel_left_Sprite2D.global_position = Vector2(570, -40)
+			$Game_Over_Back_Button.global_position = Vector2(1100,635) 
+			$PointLight2D.hide() # fixes bug where, as animate time of day() isnt run when dead, 
+			# changing the colour below will show the pointlight at day for a split second!
+			$AnimatedSprite2D.show() # show the animatedsprite2D
+			$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
+			$Food_bar_AnimatedSprite2D.show() # show food and health stats!
+			$Health_bar_AnimatedSprite2D.show()
+			if (Global.day_and_night % 2) == 0: # if it is night:
+				$PointLight2D.show() # show the pointlight!
+				$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
+				$Food_Bars_PointLight2D.energy = 1
+				$Health_Bar_PointLight2D.show()
+				$Health_Bar_PointLight2D.energy = 1
+			$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
+			player_respawning = false # this only changes back if the cutscene is inactive. 
+			# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
+			# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
+		else:
+			while get_tree().paused: # this loops, checking if the cutscene is over:
+				pass # pass when it isn't (not return as that would exit the function)
+			# then, when the cutscene is over:
+			$AnimatedSprite2D.show() # show the animatedsprite2D
+			$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
+			$Food_bar_AnimatedSprite2D.show() # Show food stat!
+			$Health_bar_AnimatedSprite2D.show() # Show health stat!
+			$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
+			$PointLight2D.show() # no need for the if case, because night always comes after the cutscenes! 
+			$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
+			$Food_Bars_PointLight2D.energy = 1
+			$Health_Bar_PointLight2D.show()
+			$Health_Bar_PointLight2D.energy = 1
+			$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
+			$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
+			$Fuel_left_Sprite2D.global_position = Vector2(570, -40)
+			$Game_Over_Back_Button.global_position = Vector2(1100,635) 
+			
+
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bm726"]
@@ -1028,17 +1141,6 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_kcc6s"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("13_naa4u")
-}],
-"loop": true,
-"name": &"Fuel_Left",
-"speed": 5.0
-}]
-
 [sub_resource type="Curve2D" id="Curve2D_rtpi6"]
 _data = {
 "points": PackedVector2Array(0, 0, 0, 0, 56.25, 20, 0, 0, 0, 0, 52.0834, 34, 0, 0, 0, 0, 45.8334, 46, 0, 0, 0, 0, 35.4166, 56, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 14.5834, 62, 0, 0, 0, 0, 8.33337, 62, 0, 0, 0, 0, -6.25, 62, 0, 0, 0, 0, -22.9166, 58, 0, 0, 0, 0, -33.3334, 50, 0, 0, 0, 0, -39.5834, 42, 0, 0, 0, 0, -45.8334, 32, 0, 0, 0, 0, -50, 22, 0, 0, 0, 0, -50, 10, 0, 0, 0, 0, -47.9166, -2, 0, 0, 0, 0, -41.6666, -14, 0, 0, 0, 0, -35.4166, -22, 0, 0, 0, 0, -25, -30, 0, 0, 0, 0, -10.4166, -36, 0, 0, 0, 0, 4.16663, -36, 0, 0, 0, 0, 20.8334, -34, 0, 0, 0, 0, 31.25, -30, 0, 0, 0, 0, 41.6666, -24, 0, 0, 0, 0, 50, -14, 0, 0, 0, 0, 54.1666, -4, 0, 0, 0, 0, 56.25, 4, 0, 0, 0, 0, 58.3334, 14)
@@ -1139,13 +1241,11 @@ position = Vector2(254, 145)
 energy = 2.0
 texture = ExtResource("13_11oj3")
 
-[node name="Fuel_left_AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="Fuel_left_Sprite2D" type="Sprite2D" parent="."]
 z_index = 5
 position = Vector2(156, -110)
 scale = Vector2(0.5, 0.5)
-sprite_frames = SubResource("SpriteFrames_kcc6s")
-animation = &"Fuel_Left"
-speed_scale = 2.08165e-12
+texture = ExtResource("13_naa4u")
 
 [node name="Panting_AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("16_ulpre")
@@ -1209,6 +1309,20 @@ z_index = 4
 position = Vector2(0, 9.5)
 scale = Vector2(0.07, 0.07)
 texture = ExtResource("20_jdmis")
+
+[node name="Respawning_PointLight2D" type="PointLight2D" parent="."]
+texture = ExtResource("19_bpsad")
+
+[node name="Respawning_Sprite2D" type="Sprite2D" parent="."]
+z_index = 4
+texture = ExtResource("19_bpsad")
+
+[node name="Respawning_Label" type="Label" parent="."]
+z_index = 5
+offset_right = 40.0
+offset_bottom = 23.0
+scale = Vector2(5, 5)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 
 [connection signal="area_entered" from="CollisionShape2D_Parent_Area2D" to="." method="_on_area_entered"]
 [connection signal="body_entered" from="CollisionShape2D_Parent_Area2D" to="." method="_on_body_entered"]

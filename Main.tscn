@@ -76,6 +76,7 @@ func _process(_delta):
 				$CanvasModulate.hide()
 		spawn_boss_mobs()
 
+
 func spawn_mobs():
 	for i in range(5):
 		var Mob = mob_scene.instantiate()
@@ -83,7 +84,6 @@ func spawn_mobs():
 		#mob.position = Vector2(200 + i * 50, 200)
 
 
-		
 func spawn_food():
 	if Global.single_player:
 		for i in range(5):
@@ -109,10 +109,12 @@ func spawn_boss_mobs():
 		# boss mobs can spawn.
 		spawned_boss_mobs = false
 
+
 func spawn_sleeper_mobs():
 	if (((Global.day_and_night+2)/2)%2) == 0: # check if the number of nights is even, if it is:
 		var sleeper_mob = sleeper_mob_scene.instantiate()
 		add_child(sleeper_mob)
+
 
 func pause_game():
 	var fuel = fuel_scene.instantiate()
