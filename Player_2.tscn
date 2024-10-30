@@ -287,6 +287,9 @@ func game_over():
 	$Health_bar_AnimatedSprite2D.hide()
 	$Food_bar_AnimatedSprite2D.hide()
 	$AnimatedSprite2D.hide()
+	$Respawning_Label.hide()
+	$Respawning_PointLight2D.hide()
+	$Respawning_Sprite2D.hide()
 	$PointLight2D.hide() # this shouldn't become visible again, 
 	# as animate time of day only runs when game_over_run is false, which it is not.
 	$Health_Bar_PointLight2D.hide() # same with these, not shown as game_over_run is true
@@ -466,16 +469,16 @@ func game_paused_true():
 		$Health_Bar_PointLight2D.hide()
 		$Food_Bars_PointLight2D.hide()
 		$PointLight2D.show()
-		if player_respawning: # if the player is in the process of respawning 
-			# (a 3 second process, highly unlikley to ever happen, however there is a lot of code to sort out the issues if it ever did!)
-			$Respawning_Label.hide()
-			$Respawning_Sprite2D.hide()
-			if $Respawning_Label.text == \"Respawning in 3...\": 
-				player_respawning_second = 3
-			elif $Respawning_Label.text == \"Respawning in 2...\": 
-				player_respawning_second = 2
-			else: 
-				player_respawning_second = 1
+	if player_respawning: # if the player is in the process of respawning 
+		# (a 3 second process, highly unlikley to ever happen, however there is a lot of code to sort out the issues if it ever did!)
+		$Respawning_Label.hide()
+		$Respawning_Sprite2D.hide()
+		if $Respawning_Label.text == \"Respawning in 3...\": 
+			player_respawning_second = 3
+		elif $Respawning_Label.text == \"Respawning in 2...\": 
+			player_respawning_second = 2
+		else: 
+			player_respawning_second = 1
 
 
 func game_paused_false():
@@ -488,35 +491,35 @@ func game_paused_false():
 		$Food_Bars_PointLight2D.show()
 		$PointLight2D.show()
 		display_food_and_health_multiplayer()
-		if player_respawning_second != 0: # this will only happen if the player is in the process of respawning in the cutscene.
-			# not using the player_respawning because that is changed back to false during the cutscene, should this be run then, meaning it can't be used.
-			# this entire block of code is very unlikely to be used much, however it prevents some major issues if respawning happened during the cutscene.
-			$Respawning_PointLight2D.show() # show the pointlight, so the label can be seen after the cutscene.
-			$Respawning_Label.show()
-			$Respawning_Sprite2D.show()
-			Global.update_multiplayer_game_over(1) # this will have changed during the cutscene, bring it back so they don't respawn.
-			game_over_run = true # this too.
-			if player_respawning_second == 1:
-				$Respawning_Label.text = \"Respawning in 1...\"
-				await get_tree().create_timer(1).timeout
-			elif player_respawning_second == 2:
-				$Respawning_Label.text = \"Respawning in 2...\"
-				await get_tree().create_timer(1).timeout
-				$Respawning_Label.text = \"Respawning in 1...\"
-				await get_tree().create_timer(1).timeout
-			else: # the only other case is == 3:
-				$Respawning_Label.text = \"Respawning in 3...\"
-				await get_tree().create_timer(1).timeout
-				$Respawning_Label.text = \"Respawning in 2...\"
-				await get_tree().create_timer(1).timeout
-				$Respawning_Label.text = \"Respawning in 1...\"
-				await get_tree().create_timer(1).timeout
-			Global.update_multiplayer_game_over(0) # this runs after the timers above have finished:
-			game_over_run = false # now the player can respawn
-			$PointLight2D.show() # shows pointlight, no need to check for multiplayer or night bc otherwise this wouldn't run! 
-			$AnimatedSprite2D.show()
-			$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false)
-			player_respawning_second = 0 # this shows the next runs of the game_paused_false that this needn't be run.
+	if player_respawning_second != 0: # this will only happen if the player is in the process of respawning in the cutscene.
+		# not using the player_respawning because that is changed back to false during the cutscene, should this be run then, meaning it can't be used.
+		# this entire block of code is very unlikely to be used much, however it prevents some major issues if respawning happened during the cutscene.
+		$Respawning_PointLight2D.show() # show the pointlight, so the label can be seen after the cutscene.
+		$Respawning_Label.show()
+		$Respawning_Sprite2D.show()
+		Global.update_multiplayer_game_over(1) # this will have changed during the cutscene, bring it back so they don't respawn.
+		game_over_run = true # this too.
+		if player_respawning_second == 1:
+			$Respawning_Label.text = \"Respawning in 1...\"
+			await get_tree().create_timer(1).timeout
+		elif player_respawning_second == 2:
+			$Respawning_Label.text = \"Respawning in 2...\"
+			await get_tree().create_timer(1).timeout
+			$Respawning_Label.text = \"Respawning in 1...\"
+			await get_tree().create_timer(1).timeout
+		else: # the only other case is == 3:
+			$Respawning_Label.text = \"Respawning in 3...\"
+			await get_tree().create_timer(1).timeout
+			$Respawning_Label.text = \"Respawning in 2...\"
+			await get_tree().create_timer(1).timeout
+			$Respawning_Label.text = \"Respawning in 1...\"
+			await get_tree().create_timer(1).timeout
+		Global.update_multiplayer_game_over(0) # this runs after the timers above have finished:
+		game_over_run = false # now the player can respawn
+		$PointLight2D.show() # shows pointlight, no need to check for multiplayer or night bc otherwise this wouldn't run! 
+		$AnimatedSprite2D.show()
+		$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false)
+		player_respawning_second = 0 # this shows the next runs of the game_paused_false that this needn't be run.
 
 
 func display_shield(delta):
