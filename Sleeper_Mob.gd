@@ -180,7 +180,7 @@ func _on_proximity_area_2d_area_entered(area):
 func _on_proximity_area_2d_area_exited(area):
 	if area.is_in_group("Player"):
 		player_in_proximity = false
-		$AnimatedSprite2D.stop()
+		$AnimatedSprite2D.stop() # stop playing the animation, to increase the code's efficiency. 
 
 
 func _on_proximity_area_2d_body_entered(body):

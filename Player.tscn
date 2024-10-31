@@ -720,7 +720,7 @@ func game_paused_true():
 		$Camera2D.zoom = Vector2(0.79, 0.79)
 		$Camera2D.global_position = Vector2(576, 324) # Centre of the map
 	# the following is lower indented beause when this should run, game_over_run will be true so won't run without a lower indent.
-	if player_respawning == true: # if the player is in the process of respawning 
+	if player_respawning: # if the player is in the process of respawning 
 		# (a 3 second process, highly unlikley to ever happen, however there is a lot of code to sort out the issues if it ever did!)
 		$Respawning_Label.hide()
 		$Respawning_Sprite2D.hide()
@@ -837,7 +837,7 @@ func count_down_respawn_process(): # this function allows the player to respawn,
 	# making the game more fun, as otherwise, one you die, its just boring!
 	await get_tree().create_timer(57).timeout # the player remains dead for 60 seconds (otherwise there's no incentive to stay alive).
 	# it is only 57 here because the last 3 are in the below countdown.
-	global_position = Vector2(576, 324)
+	global_position = Vector2(576, 324) # set the position to the centre of the map!
 	player_respawning = true # the respawn process is starting!
 	$Fuel_left_Sprite2D.global_position = Vector2(570, -40) # this is required as the position wasn't updated 
 	if Global.multiplayer_game_over != 2: # if both players haven't died:
