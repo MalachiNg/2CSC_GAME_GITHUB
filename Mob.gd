@@ -162,7 +162,7 @@ func spawn_in_random_location():
 func play_sound():
 	if sound_function_called:
 		return
-	elif sound_function_called == false and unmute:
+	elif not sound_function_called and unmute:
 		sound_function_called = true
 		var interval = randf_range(2, 15)
 		await get_tree().create_timer(interval).timeout

@@ -27,11 +27,9 @@ signal game_paused_false
 
 func _ready():
 	# this is needed for a feature that will be added, pausing the game for 4 seconds when transitioning back into night. 
-	Signals.connect(\"daytime_over\", pause_game)
+	Signals.connect(\"daytime_over\", start_cutscene)
 	if Global.single_player:
 		$CanvasModulate.hide()
-		#var player = player_scene.instantiate()
-		#add_child(player)
 	var reactor = reactor_scene.instantiate()
 	add_child(reactor)
 	var shield = shield_scene.instantiate()
@@ -42,18 +40,15 @@ func _ready():
 	Global.update_fuel(0)
 	if not Global.single_player:
 		multiplayer_camera()
-		#var player = player_scene.instantiate()
-		#add_child(player)
 		var player_2 = player_2_scene.instantiate()
 		add_child(player_2)
 	if not Global.Normal_mode:
 		for i in range (5):
 			var bomb_trap = bomb_trap_scene.instantiate()
 			add_child(bomb_trap)
-	pause_game()
+	start_cutscene() # pauses the game, and shows the cutscene for the first night!
 	# this was put before the pause, as global cannot run code when main is paused, 
 	# and nor can fuel which is what needs to get this message.
-	# WHERE WE LEFT OFF - SEE PERPLEXITY!!!
 
 
 func multiplayer_camera():
@@ -81,7 +76,6 @@ func spawn_mobs():
 	for i in range(5):
 		var Mob = mob_scene.instantiate()
 		add_child(Mob)
-		#mob.position = Vector2(200 + i * 50, 200)
 
 
 func spawn_food():
@@ -116,7 +110,7 @@ func spawn_sleeper_mobs():
 		add_child(sleeper_mob)
 
 
-func pause_game():
+func start_cutscene():
 	var fuel = fuel_scene.instantiate()
 	add_child(fuel) # spawn a fuel
 	if not Global.Normal_mode:

@@ -33,7 +33,7 @@ func show_and_hide():
 			$AnimatedSprite2D.play("Bomb") # make it a bomb, not an explosion if it has blown up before.
 			$AnimatedSprite2D.stop() # stop the continuous refresh of the animation, to the same thing. (waste of processing)
 			$CollisionShape2D.set_deferred("disabled", false)
-	elif (show_at_day % 2) != 0 and spawned_today == true: # it only runs once every day:
+	elif (show_at_day % 2) != 0 and spawned_today: # it only runs once every day:
 		$AnimatedSprite2D.hide() 
 		$CollisionShape2D.set_deferred("disabled", true)
 		spawned_today = false

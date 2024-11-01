@@ -149,7 +149,7 @@ func move_and_animate(delta): # the function that codes the animations.
 		if direction.y > 0: 
 			# check if y is greater than 0, which, as in many game programming platforms, 
 			# (0,0) is the top left of the screen, so that the y-axis is reversed, 
-			#means that the character will be moving right. As this is within the right section of the code, 
+			# means that the character will be moving right. As this is within the right section of the code, 
 			# this means the sprite will move down right.
 			$AnimatedSprite2D.play(\"move_down_right\") # as said before, down right.
 		elif direction.y < 0: # check to see if player is moving left. (already explained twice)
@@ -199,7 +199,7 @@ func food():
 
 func critical_food():
 	if food_bars == 0:
-		# $Food_bar_AnimatedSprite2D.play(\"CRITICAL!\") # this one means 0%, player starts losing health. 
+		#$Food_bar_AnimatedSprite2D.play(\"CRITICAL!\") # this one means 0%, player starts losing health. 
 		# removed as it happens later, but not called constantly, to optimise the code. 
 		if is_losing_health:
 			return
