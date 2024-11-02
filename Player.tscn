@@ -134,14 +134,14 @@ func _process(delta):
 		else:
 			cursor_control()
 		animate_time_of_day()
-		food()
+		display_food()
 		display_shield(delta)
 		show_fuel_left()
 		Global.update_player_position(global_position)
 		gain_health()
 		display_health()
 		critical_food()
-		getting_hungry()
+		decrease_food()
 		$AudioListener2D.global_position = global_position
 		# By default the audio is heard from player 1, regardless of single or multiplayer, however as mentioned further down, 
 		# when player 1 dies, AudioListener2D position then goes to player 2. 
@@ -280,7 +280,7 @@ func animate_time_of_day():
 			$PointLight2D.hide()
 
 
-func food():
+func display_food():
 	if food_bars > 5:
 		food_bars = 5
 	elif food_bars == 5: 
@@ -333,7 +333,7 @@ func critical_food():
 				is_losing_health = false
 
 
-func getting_hungry():
+func decrease_food():
 	if not touched_food: # There is a timer that starts right after a food is touched, 
 		# which then reduces the food_bars, if its already timing, this should be skipped. 
 		if is_losing_hunger: # This avoids multiple runs of the code.
@@ -857,23 +857,10 @@ func count_down_respawn_process(): # this function allows the player to respawn,
 			await get_tree().create_timer(1.0).timeout
 			if not get_tree().paused: # confirm the cutscene hasn't started during the countdown.
 				respawn_player()
-		elif get_tree().paused: # if the cutscene is in progress:
-			await Signals.game_paused_false # wait for the signal that cutscene is over.
-			# then once it is over:
-			$Respawning_PointLight2D.show() # show the pointlight so this is visible. 
-			# (if condition not required as nigth follows the cutscene)
-			$Respawning_Label.show() # The others are shown only during the day
-			$Respawning_Sprite2D.show()
-			$Respawning_Label.text = \"Respawning in 3...\"
-			await get_tree().create_timer(1.0).timeout
-			$Respawning_Label.text = \"Respawning in 2...\"
-			await get_tree().create_timer(1.0).timeout
-			$Respawning_Label.text = \"Respawning in 1...\"
-			await get_tree().create_timer(1.0).timeout
-			respawn_player()
 
 func respawn_player():
 	# Time for the respawning code:
+	print(\"run respawn player\")
 	Global.update_multiplayer_game_over(0) # resets the multiplayer game over value in global.
 	game_over_run = false # sets game over run as false, making a whole load of things run again!
 	health = 3 # resets health, and
@@ -901,32 +888,13 @@ func respawn_player():
 		if (Global.day_and_night % 2) == 0: # if it is night:
 			$PointLight2D.show() # show the pointlight!
 			$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
-			$Food_Bars_PointLight2D.energy = 1
 			$Health_Bar_PointLight2D.show()
-			$Health_Bar_PointLight2D.energy = 1
+		$Food_Bars_PointLight2D.energy = 1
+		$Health_Bar_PointLight2D.energy = 1
 		$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
 		player_respawning = false # this only changes back if the cutscene is inactive. 
 		# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
 		# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
-	else:
-		await Signals.game_paused_false # waits for the signal that game paused is over.
-		# then, when the cutscene is over:
-		$AnimatedSprite2D.show() # show the animatedsprite2D
-		$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
-		$Food_bar_AnimatedSprite2D.show() # Show food stat!
-		$Health_bar_AnimatedSprite2D.show() # Show health stat!
-		$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
-		$PointLight2D.show() # no need for the if case, because night always comes after the cutscenes! 
-		$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
-		$Food_Bars_PointLight2D.energy = 1
-		$Health_Bar_PointLight2D.show()
-		$Health_Bar_PointLight2D.energy = 1
-		$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
-		$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
-		$Fuel_left_Sprite2D.global_position = Vector2(570, -40)
-		$Game_Over_Back_Button.global_position = Vector2(1100,635) 
-		player_respawning = false
-		
 
 "
 

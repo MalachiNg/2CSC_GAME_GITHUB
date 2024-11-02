@@ -96,12 +96,12 @@ func _process(delta):
 		handle_input() #corresponds to a later function, 
 		# doesn't matter the order of which functions are called, as the computer reads everything before executing it. 
 		move_and_animate(delta) # again, corresponds to a later function.
-		food()
+		display_food()
 		display_shield(delta)
 		fuel = Global.global_fuel # ensures that the fuel is always up to date with the corresponding global fuel variable. 
 		Global.update_player_2_position(global_position)
 		animate_time_of_day()
-		getting_hungry()
+		decrease_food()
 		gain_health() 
 		critical_food()
 		$Food_bar_AnimatedSprite2D.global_position = Vector2(1185,-65)
@@ -175,7 +175,7 @@ func move_and_animate(delta): # the function that codes the animations.
 			$AnimatedSprite2D.play(\"move_up\") # UP!!!!
 
 		
-func food():
+func display_food():
 	if food_bars > 5:
 		food_bars = 5
 	elif food_bars == 5: 
@@ -228,7 +228,7 @@ func critical_food():
 
 			
 			
-func getting_hungry(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT INCREASING DIFFICULTY OVER TIME FOR \"LEVELS\"
+func decrease_food(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT INCREASING DIFFICULTY OVER TIME FOR \"LEVELS\"
 	if not touched_food: 
 		# There is a timer that starts right after a food is touched, 
 		# which then reduces the food_bars, if its already timing, this should be skipped. 
@@ -356,7 +356,7 @@ func _on_body_entered(body):
 func _on_area_entered(area):
 	if area.is_in_group(\"Foods\"):
 		food_bars += 1
-		# this sets the touched_food variable to true, preventing food to go down in the getting_hungry() function.
+		# this sets the touched_food variable to true, preventing food to go down in the decrease_food() function.
 		touched_food = true
 		# This adds 1 to the food_timer_num variable.
 		food_timer_num += 1
@@ -371,7 +371,7 @@ func _on_area_entered(area):
 		if food_timer_num == start_of_timer_num:
 			# decease the food bars. 
 			food_bars -= 1
-			# the below allows the getting_hungry() function to take over for decreasing hunger again.
+			# the below allows the decrease_food() function to take over for decreasing hunger again.
 			touched_food = false
 		else:
 			return
@@ -553,22 +553,6 @@ func count_down_respawn_process(): # this function allows the player to respawn,
 			await get_tree().create_timer(1).timeout
 			if not get_tree().paused: # confirm that the cutscene hasn't started during the past 3 seconds.
 				respawn_player()
-		elif get_tree().paused: # if the cutscene is currently happening
-			await Signals.game_paused_false # wait for the cutscene to be over. 
-			# this await has swapped out a while loop which caused the game to completely crash.
-			# then once it is over: 
-			$Respawning_PointLight2D.show() # show the pointlight so this is visible. 
-			# (if condition not required as nigth follows the cutscene)
-			$Respawning_Label.show() # The others are shown only during the day
-			$Respawning_Sprite2D.show()
-			$Respawning_Label.text = \"Respawning in 3...\"
-			await get_tree().create_timer(1.0).timeout
-			$Respawning_Label.text = \"Respawning in 2...\"
-			await get_tree().create_timer(1.0).timeout
-			$Respawning_Label.text = \"Respawning in 1...\"
-			await get_tree().create_timer(1.0).timeout
-			respawn_player()
-
 
 func respawn_player():
 	# Time for the respawning code:
@@ -585,41 +569,24 @@ func respawn_player():
 		died_from_starvation = false
 	else:
 		died_from_traps = false # reset what the player has died from, so it shows accurately when the game is truly over.
-	if not get_tree().paused: # if this is not running during a cutscene:
-		$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
-		$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
-		$PointLight2D.hide() # fixes bug where, as animate time of day() isnt run when dead, 
-		# changing the colour below will show the pointlight at day for a split second!
-		$AnimatedSprite2D.show() # show the animatedsprite2D
-		$CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
-		$Food_bar_AnimatedSprite2D.show() # show food and health stats!
-		$Health_bar_AnimatedSprite2D.show()
-		if (Global.day_and_night % 2) == 0: # if it is night:
-			$PointLight2D.show() # show the pointlight!
-			$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
-			$Food_Bars_PointLight2D.energy = 1
-			$Health_Bar_PointLight2D.show()
-			$Health_Bar_PointLight2D.energy = 1
-		$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
-		player_respawning = false # this only changes back if the cutscene is inactive. 
-		# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
-		# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
-	else: # if the cutscene is happening:
-		await Signals.game_paused_false # waits for the signal that the cutscene is over.
-		# then, when the cutscene is over:
-		$AnimatedSprite2D.show() # show the animatedsprite2D
-		$CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
-		$Food_bar_AnimatedSprite2D.show() # Show food stat!
-		$Health_bar_AnimatedSprite2D.show() # Show health stat!
-		$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
-		$PointLight2D.show() # no need for the if case, because night always comes after the cutscenes! 
+	$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
+	$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
+	$PointLight2D.hide() # fixes bug where, as animate time of day() isnt run when dead, 
+	# changing the colour below will show the pointlight at day for a split second!
+	$AnimatedSprite2D.show() # show the animatedsprite2D
+	$CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
+	$Food_bar_AnimatedSprite2D.show() # show food and health stats!
+	$Health_bar_AnimatedSprite2D.show()
+	if (Global.day_and_night % 2) == 0: # if it is night:
+		$PointLight2D.show() # show the pointlight!
 		$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
-		$Food_Bars_PointLight2D.energy = 1
 		$Health_Bar_PointLight2D.show()
-		$Health_Bar_PointLight2D.energy = 1
-		$Food_bar_AnimatedSprite2D.global_position = Vector2(-30,-65)
-		$Health_bar_AnimatedSprite2D.global_position = Vector2(-30, -20)
-		player_respawning = false
+	$Food_Bars_PointLight2D.energy = 1
+	$Health_Bar_PointLight2D.energy = 1
+	$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
+	player_respawning = false # this only changes back if the cutscene is inactive. 
+	# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
+	# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6kkaa"]
