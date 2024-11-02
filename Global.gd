@@ -39,7 +39,7 @@ func daytime_process():
 	if (day_and_night % 2) != 0:  # this checks if it is day, to check if the following should be run.
 		daytime_process_declarations += 1
 		var start_daytime_process_value = daytime_process_declarations
-		await get_tree().create_timer(15.0).timeout  # this times the day, after 30 seconds it times out and makes the day turn back into night.
+		await get_tree().create_timer(15.0).timeout  # this times the day, after 15 seconds it times out and makes the day turn back into night.
 		if daytime_process_declarations == start_daytime_process_value:
 			if day_and_night != 0:
 				# this patches a potential error, as when re playing the game, this timer continues, so this could cause,

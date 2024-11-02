@@ -777,7 +777,7 @@ func game_paused_false():
 			$Respawning_Label.text = \"Respawning in 2...\"
 			await get_tree().create_timer(1).timeout
 			$Respawning_Label.text = \"Respawning in 1...\"
-		await get_tree().create_timer(1).timeout
+			await get_tree().create_timer(1).timeout
 		respawn_player() # runs the respawn code to bring the player back in the game.
 		player_respawning_second = 0 # this shows the next runs of the game_paused_false that this needn't be run.
 
@@ -849,13 +849,28 @@ func count_down_respawn_process(): # this function allows the player to respawn,
 				$Respawning_PointLight2D.show() # show the pointlight so this is visible.
 			$Respawning_Label.show() # The others are shown only during the day
 			$Respawning_Sprite2D.show()
-		$Respawning_Label.text = \"Respawning in 3…\"
-		await get_tree().create_timer(1.0).timeout
-		$Respawning_Label.text = \"Respawning in 2…\"
-		await get_tree().create_timer(1.0).timeout
-		$Respawning_Label.text = \"Respawning in 1…\"
-		await get_tree().create_timer(1.0).timeout
-		respawn_player()
+			$Respawning_Label.text = \"Respawning in 3...\"
+			await get_tree().create_timer(1.0).timeout
+			$Respawning_Label.text = \"Respawning in 2...\"
+			await get_tree().create_timer(1.0).timeout
+			$Respawning_Label.text = \"Respawning in 1...\"
+			await get_tree().create_timer(1.0).timeout
+			if not get_tree().paused: # this fixes an enormous error which causes the game to crash. 
+				respawn_player()
+		elif get_tree().paused: # if the cutscene is in progress:
+			await Signals.game_paused_false # wait for the signal that cutscene is over.
+			# then once it is over:
+			$Respawning_PointLight2D.show() # show the pointlight so this is visible. 
+			# (if condition not required as nigth follows the cutscene)
+			$Respawning_Label.show() # The others are shown only during the day
+			$Respawning_Sprite2D.show()
+			$Respawning_Label.text = \"Respawning in 3...\"
+			await get_tree().create_timer(1.0).timeout
+			$Respawning_Label.text = \"Respawning in 2...\"
+			await get_tree().create_timer(1.0).timeout
+			$Respawning_Label.text = \"Respawning in 1...\"
+			await get_tree().create_timer(1.0).timeout
+			respawn_player()
 
 func respawn_player():
 	# Time for the respawning code:
@@ -894,8 +909,7 @@ func respawn_player():
 		# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
 		# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
 	else:
-		while get_tree().paused: # this loops, checking if the cutscene is over:
-			pass # pass when it isn't (not return as that would exit the function)
+		await Signals.game_paused_false # waits for the signal that game paused is over.
 		# then, when the cutscene is over:
 		$AnimatedSprite2D.show() # show the animatedsprite2D
 		$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!

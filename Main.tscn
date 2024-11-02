@@ -65,7 +65,7 @@ func _process(_delta):
 		$CanvasModulate.hide()
 	else:
 		if not Global.single_player:
-			if (Global.day_and_night % 2) == 0 and Global.game_over != true:
+			if (Global.day_and_night % 2) == 0 and not Global.game_over:
 				$CanvasModulate.show()
 			else:
 				$CanvasModulate.hide()
