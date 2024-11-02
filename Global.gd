@@ -46,7 +46,7 @@ func daytime_process():
 				# if the player died during the day, the night to randomly turn to day for no reason.
 				# However, since day_and_night is reset to 0 in new playthroughs from the main scene,
 				# and this code doesn't run until minimum day_and_night = 1,
-				# this small line of code patches that potential error with no possible repercussions.
+				# this small line  of code patches that potential error with no possible repercussions.
 				day_and_night += 1
 				Signals.daytime_over.emit()
 

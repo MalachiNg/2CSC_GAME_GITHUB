@@ -855,7 +855,7 @@ func count_down_respawn_process(): # this function allows the player to respawn,
 			await get_tree().create_timer(1.0).timeout
 			$Respawning_Label.text = \"Respawning in 1...\"
 			await get_tree().create_timer(1.0).timeout
-			if not get_tree().paused: # this fixes an enormous error which causes the game to crash. 
+			if not get_tree().paused: # confirm the cutscene hasn't started during the countdown.
 				respawn_player()
 		elif get_tree().paused: # if the cutscene is in progress:
 			await Signals.game_paused_false # wait for the signal that cutscene is over.
