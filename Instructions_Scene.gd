@@ -14,7 +14,7 @@ var page_9
 func _ready():
 	$TextureRect.texture = preload("res://INSTRUCTIONS_page_1.png")
 	Global.update_instructions_opened()
-	$Next_Button.global_position = Vector2(920, 560)
+	$Next_Button.global_position = Vector2(960, 560)
 	$TextureRect.show() # moved to ready as nothing is hiding it so this is simple optimisation.
 
 
