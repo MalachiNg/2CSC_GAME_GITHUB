@@ -1,5 +1,5 @@
 extends CharacterBody2D  # using a 2D environment.
-@onready var speed = randi_range(12, 48)  # MOB SPEED INCREASES AS GAME PROGRESSES. (not here, but relevant here)
+@onready var speed = randi_range(24, 96)  # MOB SPEED INCREASES AS GAME PROGRESSES. (not here, but relevant here)
 @onready var player_target_position: Vector2 = Vector2.ZERO
 @onready var player_2_target_position: Vector2 = Vector2.ZERO
 @onready var player_pos: Vector2 = Vector2.ZERO
@@ -7,9 +7,9 @@ extends CharacterBody2D  # using a 2D environment.
 @onready var direction: Vector2 = Vector2.ZERO  # instead of DOWN as it is in player,
 # as the player automatically starts moving down, this is set to ZERO, so the variable only measures the direction.
 @onready var min_x = 0  # the minimum x co-ordinate the player can be in as long as they stay in the map.
-@onready var max_x = 1152  # the maximum x co-ord
+@onready var max_x = 2304  # the maximum x co-ord
 @onready var min_y = 0  # min y co-ord
-@onready var max_y = 648  # max y co-ord
+@onready var max_y = 1296  # max y co-ord
 @onready var spawned_today = false
 @onready var despawned_tonight = false
 @onready var sound_function_called = false
