@@ -51,7 +51,7 @@ func _process(_delta):
 
 
 func move_to_player():
-	if single_player:
+	if single_player or player_2_pos == Vector2(-1, -1): # Runs if only player 1 is alive
 		if (Global.day_and_night % 2) == 0:  # ensures the mob only moves during the night.
 			# and this corresponds to the other piece of code in the player.gd script,
 			# this one accessing the position from the global script.
@@ -61,17 +61,21 @@ func move_to_player():
 				velocity = player_target_position * (speed * (1 + (Global.day_and_night) * 0.05))
 				# increases speed as game progresses.
 				move_and_slide()
-	else:
-		if (Global.day_and_night % 2) == 0:  # ensures the mob only moves during the night.
+	elif not single_player and player_2_pos != Vector2(-1, -1): # ensures this code only runs in multiplayer when player 2 is alive.
+		if (Global.day_and_night % 2) == 0:  # ensures the mob only moves during the night. 
 			player_target_position = (player_pos - global_position).normalized()
 			# this gets the target position for the mob to move towards player 1.
 			player_2_target_position = (player_2_pos - global_position).normalized()
 			# this does the same thing, for player 2.
-
+			if player_pos == Vector2(-1, -1): # if player 1 is dead (if case already provided for player 2 above)
+				# if player 1 is dead, mobs move to player 2 regardless. 
+				# therefore, no further if statements are required. 
+				velocity = player_2_target_position * (speed * (1 + (Global.day_and_night) * 0.05))
+				# increases speed as game progresses.
+				move_and_slide()
 			if (
 				global_position.distance_to(player_pos) > global_position.distance_to(player_2_pos)
 				and global_position.distance_to(player_pos) > 3
-				and player_2_pos != Vector2(-1, -1)
 			):
 				# this parameter set checks if player 1 or 2 is closer to the mob, and chases player 1 if it's closer.
 				# it also ensures that the player isn't less than 3 away to keep from being inside the player.
@@ -84,7 +88,6 @@ func move_to_player():
 			elif (
 				global_position.distance_to(player_2_pos) > global_position.distance_to(player_pos)
 				and global_position.distance_to(player_2_pos) > 3
-				and player_pos != Vector2(-1, -1)
 			):
 				# this parameter set pretty much does the same thing as the last,
 				# but makes the mob move towards the player 2 if it's closer.
@@ -98,13 +101,6 @@ func move_to_player():
 				# (this addresses an issue where mobs would stop when both players were in the same place), then:
 				velocity = player_target_position * (speed * (1 + (Global.day_and_night) * 0.05))  # move toward player 1.
 				# (or 2, makes absolutely no difference)
-				move_and_slide()
-			elif player_2_pos == Vector2(-1, -1):  # if player 2 is dead, (since they move to -1, -1 when dead,
-				# and can't go there otherwise, then.
-				velocity = player_target_position * (speed * (1 + (Global.day_and_night) * 0.05))  # move to player 1.
-				move_and_slide()
-			elif player_pos == Vector2(-1, -1):  # if player 1 is dead, then:
-				velocity = player_2_target_position * (speed * (1 + (Global.day_and_night) * 0.05))  # move to player 2.
 				move_and_slide()
 
 

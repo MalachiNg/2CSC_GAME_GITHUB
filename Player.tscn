@@ -835,7 +835,7 @@ func display_shield(delta):
 
 func count_down_respawn_process(): # this function allows the player to respawn, 
 	# making the game more fun, as otherwise, one you die, its just boring!
-	await get_tree().create_timer(5).timeout # the player remains dead for 60 seconds (otherwise there's no incentive to stay alive).
+	await get_tree().create_timer(57).timeout # the player remains dead for 60 seconds (otherwise there's no incentive to stay alive).
 	# it is only 57 here because the last 3 are in the below countdown.
 	global_position = Vector2(1152, 648) # set the position to the centre of the map!
 	player_respawning = true # the respawn process is starting!
@@ -859,41 +859,44 @@ func count_down_respawn_process(): # this function allows the player to respawn,
 				respawn_player()
 
 func respawn_player():
-	# Time for the respawning code:
-	Global.update_multiplayer_game_over(0) # resets the multiplayer game over value in global.
-	game_over_run = false # sets game over run as false, making a whole load of things run again!
-	health = 3 # resets health, and
-	food_bars = 5 # also food stats to full! 
-	$Respawning_Label.hide()
-	$Respawning_PointLight2D.hide()
-	$Respawning_Sprite2D.hide()
-	if died_from_mobs:
-		died_from_mobs = false
-	elif died_from_starvation:
-		died_from_starvation = false
-	else:
-		died_from_traps = false # reset what the player has died from, so it shows accurately when the game is truly over.
-	if not get_tree().paused: # if this is not running during a cutscene:
-		$Food_bar_AnimatedSprite2D.global_position = Vector2(-60,-130)
-		$Health_bar_AnimatedSprite2D.global_position = Vector2(-60, -40)
-		$Fuel_left_Sprite2D.global_position = Vector2(1140, -80)
-		$Game_Over_Back_Button.global_position = Vector2(2200, 1270) 
-		$PointLight2D.hide() # fixes bug where, as animate time of day() isnt run when dead, 
-		# changing the colour below will show the pointlight at day for a split second!
-		$AnimatedSprite2D.show() # show the animatedsprite2D
-		$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
-		$Food_bar_AnimatedSprite2D.show() # show food and health stats!
-		$Health_bar_AnimatedSprite2D.show()
-		if (Global.day_and_night % 2) == 0: # if it is night:
-			$PointLight2D.show() # show the pointlight!
-			$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
-			$Health_Bar_PointLight2D.show()
-		$Food_Bars_PointLight2D.energy = 1
-		$Health_Bar_PointLight2D.energy = 1
-		$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
-		player_respawning = false # this only changes back if the cutscene is inactive. 
-		# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
-		# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
+	if Global.multiplayer_game_over != 2: # this confirms that the other player is still alive.
+		# This is implimented due ot an error, this being, if the other player died during the 3 second countdown, 
+		# the game would \"restart\" with the game over screen moving and still visible. 
+		# Time for the respawning code:
+		Global.update_multiplayer_game_over(0) # resets the multiplayer game over value in global.
+		game_over_run = false # sets game over run as false, making a whole load of things run again!
+		health = 3 # resets health, and
+		food_bars = 5 # also food stats to full! 
+		$Respawning_Label.hide()
+		$Respawning_PointLight2D.hide()
+		$Respawning_Sprite2D.hide()
+		if died_from_mobs:
+			died_from_mobs = false
+		elif died_from_starvation:
+			died_from_starvation = false
+		else:
+			died_from_traps = false # reset what the player has died from, so it shows accurately when the game is truly over.
+		if not get_tree().paused: # if this is not running during a cutscene:
+			$Food_bar_AnimatedSprite2D.global_position = Vector2(-60,-130)
+			$Health_bar_AnimatedSprite2D.global_position = Vector2(-60, -40)
+			$Fuel_left_Sprite2D.global_position = Vector2(1140, -80)
+			$Game_Over_Back_Button.global_position = Vector2(2200, 1270) 
+			$PointLight2D.hide() # fixes bug where, as animate time of day() isnt run when dead, 
+			# changing the colour below will show the pointlight at day for a split second!
+			$AnimatedSprite2D.show() # show the animatedsprite2D
+			$CollisionShape2D_Parent_Area2D/CollisionShape2D.set_deferred(\"disabled\", false) # enable collisions!
+			$Food_bar_AnimatedSprite2D.show() # show food and health stats!
+			$Health_bar_AnimatedSprite2D.show()
+			if (Global.day_and_night % 2) == 0: # if it is night:
+				$PointLight2D.show() # show the pointlight!
+				$Food_Bars_PointLight2D.show() # show the pointlight 2ds of the previous sprites to make them visible.
+				$Health_Bar_PointLight2D.show()
+			$Food_Bars_PointLight2D.energy = 1
+			$Health_Bar_PointLight2D.energy = 1
+			$PointLight2D.color = Color8(255, 255, 255, 65) # change the pointlight color to be the original colour!
+			player_respawning = false # this only changes back if the cutscene is inactive. 
+			# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
+			# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bm726"]
