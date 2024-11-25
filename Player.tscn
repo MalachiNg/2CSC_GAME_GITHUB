@@ -340,6 +340,7 @@ func decrease_food():
 			return
 		else:
 			is_losing_hunger = true
+			var start_of_timer_num = food_timer_num
 			if Global.Normal_mode:
 				# below, because speed of everything has decreased by 40% its only fair to make the food wiat time longer, 
 				# because it takes longer to get fuel. therefore, wait time has increased by 40% from 25 to 35.
@@ -360,6 +361,7 @@ func decrease_food():
 			await get_tree().create_timer(food_wait_time).timeout
 			if not touched_food: 
 				# This ensures that during the timer, the player hasn't touched a food and started a new timer.
+				#if food_timer_num == start_of_timer_num: # if the user hasn't picked up a 
 				food_bars -= 1
 				is_losing_hunger = false
 			else:
@@ -542,9 +544,9 @@ func _on_area_entered(area):
 		food_timer_num += 1
 		var start_of_timer_num = food_timer_num
 		if Global.Normal_mode:
-			food_wait_time = (25*(1-(Global.day_and_night * 0.05)))
-		else:
-			food_wait_time = (15*(1-(Global.day_and_night * 0.08))) 
+			food_wait_time = (35*(1-(Global.day_and_night * 0.05)))
+		elif not Global.Normal_mode:
+			food_wait_time = (21*(1-(Global.day_and_night * 0.08))) 
 		await get_tree().create_timer(food_wait_time).timeout
 		if food_timer_num == start_of_timer_num:
 			food_bars -= 1
