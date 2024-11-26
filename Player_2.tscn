@@ -250,7 +250,7 @@ func decrease_food(): # MAYBE CHANGE THIS TO CORRESPOND TO THE DAY AND NIGHT INC
 				# providing an steadily increasing challenge to help excercise the user's brains!
 			# this only occurs on the normal difficulty, however, and in hard mode this happens.
 			else:
-				food_wait_time = (21*(1-(Global.day_and_night * 0.1))) # same thing happened here, wait time increased by 40%.
+				food_wait_time = (21*(1-(Global.day_and_night * 0.08))) # same thing happened here, wait time increased by 40%.
 				# a far shorter, and more quickly decreasing time to reduce hunger. 
 			await get_tree().create_timer(food_wait_time).timeout
 			if not touched_food: 
