@@ -139,7 +139,6 @@ func spawn_in_random_location():  # this spawns the mob in a reandom location, w
 			spawn_in_random_location() # try again. 
 			return # prevent running further, pretty pointless since theres nothing more but still!
 
-
 func animate_moving_to_player_1(): 
 		var player_position = player_pos-global_position
 		var distance_to_player = global_position.distance_to(player_pos)

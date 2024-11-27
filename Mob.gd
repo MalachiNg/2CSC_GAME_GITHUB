@@ -17,19 +17,18 @@ extends CharacterBody2D  # using a 2D environment.
 @onready var angle : int
 @onready var single_player = Global.single_player
 @onready var is_night = true
+@onready var game_over_run
 
 func _ready():
 	Signals.connect("game_paused_true", spawn_in_random_location)
+	Signals.connect("game_over", game_over)
 	if not Global.Normal_mode:
 		speed *= 1.2  # makes the speed 20% faster if the user selects hard mode.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Global.game_over:
-		$AnimatedSprite2D.hide()
-		$CollisionShape2D.set_deferred("disabled", true)
-	else:
+	if not game_over_run: 
 		move_to_player()
 		spawn_and_despawn()
 		play_sound()
@@ -277,3 +276,7 @@ func animate_moving_to_player_2():
 				# LEFT
 				$AnimatedSprite2D.play("move_left")
 			
+func game_over():
+	$AnimatedSprite2D.hide()
+	$CollisionShape2D.set_deferred("disabled", true)
+	game_over_run = true

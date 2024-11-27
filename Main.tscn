@@ -17,17 +17,14 @@ const boss_mob_scene = preload(\"res://Boss_mob.tscn\")
 const sleeper_mob_scene = preload(\"res://sleeper_mob.tscn\")
 const bomb_trap_scene = preload(\"res://bomb_trap.tscn\")
 const shield_scene = preload(\"res://Shield.tscn\")
-var spawned_fuel = false
-var spawned_boss_mobs = false
-var spawned_sleeper_mobs = false
-signal game_paused_true
-signal game_paused_false
-
+var single_player = Global.single_player
+var game_over_run
 
 func _ready(): 
 	# this is needed for a feature that will be added, pausing the game for 4 seconds when transitioning back into night. 
 	Signals.connect(\"daytime_over\", start_cutscene)
-	if Global.single_player:
+	#Signals.connect(\"game_won\", game_completed)
+	if single_player:
 		$CanvasModulate.hide()
 	var reactor = reactor_scene.instantiate()
 	add_child(reactor)
@@ -37,7 +34,7 @@ func _ready():
 	spawn_mobs()
 	Global.update_day_and_night(0)
 	Global.update_fuel(0)
-	if not Global.single_player:
+	if not single_player:
 		multiplayer_camera()
 		var player_2 = player_2_scene.instantiate()
 		add_child(player_2)
@@ -63,22 +60,19 @@ func _process(_delta):
 	if Global.game_over:
 		$CanvasModulate.hide()
 	else:
-		if not Global.single_player:
-			if (Global.day_and_night % 2) == 0 and not Global.game_over:
-				$CanvasModulate.show()
-			else:
+		if not single_player:
+			if (Global.day_and_night % 2) != 0:
 				$CanvasModulate.hide()
-		spawn_boss_mobs()
 
 
 func spawn_mobs():
 	for i in range(5):
-		var Mob = mob_scene.instantiate()
-		add_child(Mob)
+		var mob = mob_scene.instantiate()
+		add_child(mob)
 
 
 func spawn_food():
-	if Global.single_player:
+	if single_player:
 		for i in range(5):
 			var food = food_scene.instantiate()
 			add_child(food) # spawn a food.
@@ -89,18 +83,10 @@ func spawn_food():
 
 
 func spawn_boss_mobs():
-	if (Global.day_and_night % 2) == 0 and not spawned_boss_mobs: 
-		# if it is night, and this hasn't run before, then:
-		spawned_boss_mobs = true # make sure it doesn't run again.
+	if (Global.day_and_night % 2) == 0:
 		if (((Global.day_and_night+2)/2)%3) == 0: # check if the number of nights is a multiple of 3, if it is:
 			var boss_mob = boss_mob_scene.instantiate() # spawn a new boss mob!
-			add_child(boss_mob) 
-		else: # if it isn't a multiple of three do nothing as a new boss mob only spawns into the game every 3 nights.
-			return
-	elif (Global.day_and_night % 2) != 0 and spawned_boss_mobs: 
-		# if it has ticked over to day, then make the spawned variable false again, so that when it ticks to night, 
-		# boss mobs can spawn.
-		spawned_boss_mobs = false
+			add_child(boss_mob)
 
 
 func spawn_sleeper_mobs():
@@ -114,6 +100,7 @@ func start_cutscene():
 	add_child(fuel) # spawn a fuel
 	if not Global.Normal_mode:
 		spawn_sleeper_mobs() # sleeper mobs are only spawned in hard mode. 
+	spawn_boss_mobs()
 	Signals.game_paused_true.emit()
 	get_tree().paused = true
 	$Label.show()
@@ -131,7 +118,7 @@ func start_cutscene():
 	$Label.hide()
 	$Label_background_Sprite2D.hide()
 	$Label_PointLight2D.hide()
-	if Global.single_player:
+	if single_player:
 		$CanvasModulate.hide()
 "
 

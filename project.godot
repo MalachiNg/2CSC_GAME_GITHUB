@@ -10,11 +10,13 @@ config_version=5
 
 [application]
 
-config/name="2CSC GAME"
+config/name="2CSC_GAME_GITHUB"
 run/main_scene="res://Start_scene.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 run/max_fps=45
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.141176, 0.141176, 0.141176, 0)
+boot_splash/image="res://Monster_Mania_Loading.png"
+config/icon="res://Monster_Mania_Icon_Subject.png"
 
 [autoload]
 
@@ -31,6 +33,7 @@ settings/enabled=false
 window/size/viewport_width=2304
 window/size/viewport_height=1296
 window/stretch/mode="canvas_items"
+mouse_cursor/custom_image="res://Custom_cursor_logo.png"
 
 [global]
 

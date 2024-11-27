@@ -14,7 +14,7 @@ var Unmute = true
 var player_2_died_from: int = 0
 var WASD_and_arrows = true
 var instructions_opened = false
-signal daytime_over
+
 
 
 func update_player_2_position(pos: Vector2):
@@ -37,8 +37,9 @@ func daytime_process():
 				# However, since day_and_night is reset to 0 in new playthroughs from the main scene,
 				# and this code doesn't run until minimum day_and_night = 1,
 				# this small line  of code patches that potential error with no possible repercussions.
-				day_and_night += 1
-				Signals.daytime_over.emit()
+				if not game_over:
+					day_and_night += 1
+					Signals.daytime_over.emit()
 
 
 func update_day_and_night(new_day_or_night_value: int):

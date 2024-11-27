@@ -69,6 +69,7 @@ func _ready():
 	# this line of code makes the AnimatedSprite2D node play the move_down animation to match the velocity. 
 	Signals.connect(\"game_paused_true\", game_paused_true)
 	Signals.connect(\"game_paused_false\", game_paused_false)
+	Signals.connect(\"game_won\", game_won)
 	# this method of connecting does the same as in player, but is differently formatted. 
 	# i guess it shows i know different ways to code this?
 	Global.player_position = global_position # this is added, 
@@ -174,7 +175,7 @@ func move_and_animate(delta): # the function that codes the animations.
 		elif direction.y < 0: # and only moving up!!!
 			$AnimatedSprite2D.play(\"move_up\") # UP!!!!
 
-		
+
 func display_food():
 	if food_bars > 5:
 		food_bars = 5
@@ -364,7 +365,7 @@ func _on_area_entered(area):
 		var start_of_timer_num = food_timer_num
 		if Global.Normal_mode:
 			food_wait_time = (35*(1-(Global.day_and_night * 0.05)))
-		elif not Global.Normal_mode:
+		else:
 			food_wait_time = (21*(1-(Global.day_and_night * 0.08))) 
 		await get_tree().create_timer(food_wait_time).timeout
 		# then, in this if section of the code, it checks if the start_of_timer_num is the same as food_timer_num.
@@ -593,6 +594,15 @@ func respawn_player():
 		player_respawning = false # this only changes back if the cutscene is inactive. 
 		# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
 		# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
+
+func game_won():
+	$AnimatedSprite2D.hide()
+	$CollisionShape2D.set_deferred(\"disabled\", true)
+	$Food_Bars_PointLight2D.hide()
+	$Health_bar_AnimatedSprite2D.hide()
+	$Food_bar_AnimatedSprite2D.hide()
+	$Health_Bar_PointLight2D.hide()
+	$Path2D/PathFollow2D/Shield_Sprite2D.hide()
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6kkaa"]

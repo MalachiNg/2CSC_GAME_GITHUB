@@ -46,5 +46,4 @@ position = Vector2(1588, 646)
 scale = Vector2(2, 2)
 shape = SubResource("CircleShape2D_hspia")
 
-[connection signal="area_entered" from="." to="." method="detect_player_2"]
-[connection signal="body_entered" from="." to="." method="detect_player_1"]
+[connection signal="area_entered" from="." to="." method="detect_player"]

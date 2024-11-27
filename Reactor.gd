@@ -5,6 +5,7 @@ extends Area2D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$AnimatedSprite2D.show()
+	$AnimatedSprite2D.play("Reactor_off")
 	Signals.connect("game_paused_true", animate)
 
 
@@ -15,25 +16,7 @@ func animate():
 		$AnimatedSprite2D.play("Reactor_on")  # show the reactor as on.
 
 
-func detect_player_1(body):
-	if (Global.day_and_night % 2) != 0:
-		return
-	else:
-		var fuel_requirement = (Global.day_and_night + 2) / 2
-		# this line of code adds 2 to the day and night variable, and divides the resulting number by 2.
-		# this results in the number of nights that the character has played, including the one they are currently playing,
-		# as this code only runs during the night.
-		if body.is_in_group("Player"):
-			if Global.global_fuel < fuel_requirement:
-				return
-			elif Global.global_fuel == fuel_requirement:
-				Global.update_fuel(0)
-				var new_day_night = Global.day_and_night + 1
-				Global.update_day_and_night(new_day_night)
-				animate()
-
-
-func detect_player_2(area):
+func detect_player(area):
 	if (Global.day_and_night % 2) != 0:
 		return
 	else:
@@ -49,3 +32,5 @@ func detect_player_2(area):
 				var new_day_night = Global.day_and_night + 1
 				Global.update_day_and_night(new_day_night)
 				animate()
+				if new_day_night == 14:
+					Signals.game_won.emit()
