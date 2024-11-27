@@ -1,5 +1,5 @@
 extends CharacterBody2D  # using a 2D environment.
-@onready var speed = randi_range(24, 96)  # MOB SPEED INCREASES AS GAME PROGRESSES. (not here, but relevant here)
+@onready var speed = randi_range(24, 90)  # MOB SPEED INCREASES AS GAME PROGRESSES. (not here, but relevant here)
 @onready var player_target_position: Vector2 = Vector2.ZERO
 @onready var player_2_target_position: Vector2 = Vector2.ZERO
 @onready var player_pos: Vector2 = Vector2.ZERO

@@ -32,5 +32,10 @@ func detect_player(area):
 				var new_day_night = Global.day_and_night + 1
 				Global.update_day_and_night(new_day_night)
 				animate()
-				if new_day_night == 14:
-					Signals.game_won.emit()
+				if Global.Normal_mode:
+					if new_day_night == 15:
+						Signals.game_won.emit()
+				else:
+					if new_day_night == 19:
+						Signals.game_won.emit()
+				

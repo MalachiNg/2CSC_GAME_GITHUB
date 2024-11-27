@@ -69,7 +69,7 @@ func _ready():
 	# this line of code makes the AnimatedSprite2D node play the move_down animation to match the velocity. 
 	Signals.connect(\"game_paused_true\", game_paused_true)
 	Signals.connect(\"game_paused_false\", game_paused_false)
-	Signals.connect(\"game_won\", game_won)
+	Signals.game_won.connect(self.game_won)
 	# this method of connecting does the same as in player, but is differently formatted. 
 	# i guess it shows i know different ways to code this?
 	Global.player_position = global_position # this is added, 
