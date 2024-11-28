@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://b6il8d5ok5ax4"]
+[gd_scene load_steps=16 format=3 uid="uid://b6il8d5ok5ax4"]
 
 [ext_resource type="Script" path="res://Options_Scene.gd" id="1_8gq7s"]
 [ext_resource type="Texture2D" uid="uid://chr4rry887ix2" path="res://Single_or_multiplayer.png" id="2_2dx5c"]
@@ -12,6 +12,9 @@
 [ext_resource type="Texture2D" uid="uid://brdfhsclopupm" path="res://Cursor_unselected.png" id="11_s2pts"]
 [ext_resource type="Texture2D" uid="uid://b1glcseshapst" path="res://Selected_Unmute.png" id="11_yub4o"]
 [ext_resource type="Texture2D" uid="uid://bn334j18lycvm" path="res://Unselected_Mute.png" id="12_grnkl"]
+[ext_resource type="Texture2D" uid="uid://ccx58oo06r18u" path="res://increase_goal_arrow_button.png" id="13_b1gf8"]
+[ext_resource type="Texture2D" uid="uid://g1rneqptuyaq" path="res://goal_on_0_arrow_button.png" id="14_fpj22"]
+[ext_resource type="Texture2D" uid="uid://bnw1myh3euqpk" path="res://infinite_goal_background.png" id="15_fpr7l"]
 
 [node name="Options_Scene" type="Node"]
 script = ExtResource("1_8gq7s")
@@ -113,6 +116,37 @@ scale = Vector2(0.8, 0.8)
 icon = ExtResource("11_lnohr")
 flat = true
 
+[node name="Increase_goal_Button" type="Button" parent="."]
+offset_left = 1690.0
+offset_top = 671.0
+offset_right = 2876.0
+offset_bottom = 1863.0
+scale = Vector2(0.5, 0.5)
+icon = ExtResource("13_b1gf8")
+flat = true
+
+[node name="Decrease_goal_Button" type="Button" parent="."]
+offset_left = 28.0
+offset_top = 676.0
+offset_right = 1214.0
+offset_bottom = 1868.0
+scale = Vector2(0.5, 0.5)
+icon = ExtResource("14_fpj22")
+flat = true
+
+[node name="Goal_Background_Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(1152, 970)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("15_fpr7l")
+
+[node name="Goal_Label" type="Label" parent="."]
+offset_left = 1090.0
+offset_top = 816.0
+offset_right = 1364.0
+offset_bottom = 839.0
+scale = Vector2(13, 13)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+
 [connection signal="pressed" from="Single_Player_Button" to="." method="_on_single_player_button_pressed"]
 [connection signal="pressed" from="Multiplayer_Button" to="." method="_on_multiplayer_button_pressed"]
 [connection signal="pressed" from="Back_Button" to="." method="_on_back_button_pressed"]
@@ -123,3 +157,5 @@ flat = true
 [connection signal="pressed" from="Mute_Button" to="." method="_on_mute_button_pressed"]
 [connection signal="pressed" from="Cursor_Button" to="." method="_on_cursor_button_pressed"]
 [connection signal="pressed" from="WASD_and_arrows_Button" to="." method="_on_wasd_and_arrows_button_pressed"]
+[connection signal="pressed" from="Increase_goal_Button" to="." method="_on_increase_goal_button_pressed"]
+[connection signal="pressed" from="Decrease_goal_Button" to="." method="_on_decrease_goal_button_pressed"]

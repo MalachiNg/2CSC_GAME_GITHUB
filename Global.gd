@@ -14,6 +14,7 @@ var Unmute = true
 var player_2_died_from: int = 0
 var WASD_and_arrows = true
 var instructions_opened = false
+var nights_goal : int = 0
 
 
 
@@ -95,3 +96,6 @@ func update_WASD_and_arrows(new_bool_value: bool):
 func update_instructions_opened():
 	# this one doesn't get changed back to false, so doesn't need the same bool_variable : bool, instructions_opened = bool_variable thing.
 	instructions_opened = true
+
+func update_nights_goal(goal : int):
+	nights_goal = goal

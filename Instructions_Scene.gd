@@ -9,6 +9,7 @@ var page_6
 var page_7 
 var page_8 
 var page_9 
+var page_10
 
 
 func _ready():
@@ -50,8 +51,11 @@ func _process(_delta):
 		$Back_Button.global_position = Vector2(0, -22)
 		$Next_Button.global_position = Vector2(1900, 40)
 	elif page == 9:
-		$Back_Button.global_position = Vector2(1900, -22)
+		$Next_Button.global_position = Vector2(1900, 40)
 		$TextureRect.texture = page_9
+	elif page == 10:
+		$Back_Button.global_position = Vector2(1900, 10)
+		$TextureRect.texture = page_10
 		$Next_Button.hide()
 
 
@@ -83,4 +87,7 @@ func _on_next_button_pressed():
 	if page == 8:
 		page_8 = preload("res://INSTRUCTIONS_page_8.png")
 	if page == 9:
-		page_9 = preload("res://INSTRUCTIONS_page_9.png")
+		page_9 = preload("res://INSTRUCTIONS_page_10.png") # the following 2 have been switched to match the order in the options section. 
+		# For whatever reason I cannot rename the page 9 file.
+	if page == 10:
+		page_10 = preload("res://INSTRUCTIONS_page_9.png")

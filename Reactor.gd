@@ -1,5 +1,7 @@
 extends Area2D
 @onready var day_night = Global.day_and_night
+var target_day_and_night : int
+var infinite_goal = true
 
 
 # Called when the node enters the scene tree for the first time.
@@ -7,6 +9,11 @@ func _ready():
 	$AnimatedSprite2D.show()
 	$AnimatedSprite2D.play("Reactor_off")
 	Signals.connect("game_paused_true", animate)
+	if Global.nights_goal != 0: # if the goal has been set:
+		target_day_and_night = (((Global.nights_goal)*2)-1) # then find the value of the day and night whne the goal is met.
+		infinite_goal = false # and prevent the goal from being infinite. 
+	# if the goal hasn't manually been set however, it defaults to infinite, as shown in the variable declaration section.
+	
 
 
 func animate():
@@ -32,10 +39,6 @@ func detect_player(area):
 				var new_day_night = Global.day_and_night + 1
 				Global.update_day_and_night(new_day_night)
 				animate()
-				if Global.Normal_mode:
-					if new_day_night == 15:
+				if not infinite_goal: 
+					if new_day_night == target_day_and_night:
 						Signals.game_won.emit()
-				else:
-					if new_day_night == 19:
-						Signals.game_won.emit()
-				

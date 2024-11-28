@@ -10,6 +10,7 @@ const Unselected_2_Players = preload("res://Unselected_2_Players.png")
 const Normal_or_Hard_Mode = preload("res://Normal_or_Hard_Mode.png")
 const Mute_or_Unmute = preload("res://Mute_or_Unmute.png")
 const WASD_and_arrows_or_cursor = preload("res://WASD_and_arrows_or_cursor.png")
+const Nights_survived_goal = preload("res://Nights_Survived_Goal.png")
 
 # The following are declared here, but not set to a value.
 # instead, they are set values before they appear, to spread the load out and make performance better.
@@ -22,10 +23,16 @@ var Selected_Unmute
 var Unselected_Unmute
 var Selected_Mute
 var Unselected_Mute
+var Nights_goal_infinite
+var Decrease_nights_goal
+var infinite_goal_background
+var regular_goal_background
 var Selected_WASD_and_arrows
 var Unselected_WASD_and_arrows
 var Selected_cursor
 var Unselected_cursor
+var nights_goal : int = 0
+
 
 
 # Called when the node enters the scene tree for the first time.
@@ -36,6 +43,10 @@ func _ready():
 	$Unmute_Button.hide()
 	$WASD_and_arrows_Button.hide()
 	$Cursor_Button.hide()
+	$Decrease_goal_Button.hide()
+	$Increase_goal_Button.hide()
+	$Goal_Background_Sprite2D.hide()
+	$Goal_Label.hide()
 	if Global.single_player:
 		Selected_Single_Player()
 	else:
@@ -58,16 +69,22 @@ func _process(_delta):
 
 	elif page == 3:
 		$TextureRect.texture = Mute_or_Unmute
-		if not Global.single_player:
-			$Next_Button.hide()
 		$Hard_Mode_Button.hide()
 		$Normal_Mode_Button.hide()
 		mute_or_unmute()
 	elif page == 4:
-		$TextureRect.texture = WASD_and_arrows_or_cursor
-		$Next_Button.hide()
 		$Mute_Button.hide()
 		$Unmute_Button.hide()
+		if not Global.single_player:
+			$Next_Button.hide()
+		nights_survived_select()
+	elif page == 5:
+		$Next_Button.hide()
+		$Goal_Background_Sprite2D.hide()
+		$Increase_goal_Button.hide()
+		$Decrease_goal_Button.hide()
+		$Goal_Label.hide()
+		$TextureRect.texture = WASD_and_arrows_or_cursor
 		wasd_and_arrows_or_cursor()
 
 
@@ -122,6 +139,11 @@ func _on_next_button_pressed():
 		Unselected_Unmute = preload("res://Unselected_Unmute.png")
 		Selected_Mute = preload("res://Selected_Mute.png")
 		Unselected_Mute = preload("res://Unselected_Mute.png")
+	elif page == 4:
+		Decrease_nights_goal = preload("res://decrease_goal_arrow_button.png")
+		Nights_goal_infinite = preload("res://goal_on_0_arrow_button.png") # when the nights is 0, it is an infinite goal. 
+		infinite_goal_background = preload("res://infinite_goal_background.png")
+		regular_goal_background = preload("res://nights_survived_goal_background.png")
 
 	else:
 		Selected_WASD_and_arrows = preload("res://WASD_and_arrows_selected.png")
@@ -195,3 +217,39 @@ func _on_cursor_button_pressed():
 	Global.update_WASD_and_arrows(false)
 	$WASD_and_arrows_Button.icon = Unselected_WASD_and_arrows
 	$Cursor_Button.icon = Selected_cursor
+
+func nights_survived_select():
+	$Decrease_goal_Button.show()
+	$Increase_goal_Button.show()
+	$Goal_Background_Sprite2D.show()
+	$TextureRect.texture = Nights_survived_goal
+	if Global.nights_goal != 0:
+		$Decrease_goal_Button.icon = Decrease_nights_goal
+		$Goal_Background_Sprite2D.texture = regular_goal_background
+		$Goal_Label.show()
+		$Goal_Label.text = str(Global.nights_goal)
+	# no else needed, the other is default. 
+	
+	
+
+
+func _on_increase_goal_button_pressed():
+	$Goal_Label.show()
+	Global.update_nights_goal(Global.nights_goal+1)
+	$Goal_Label.text = str(Global.nights_goal)
+	if Global.nights_goal == 10: # if it became double digit from single digit:
+		$Goal_Label.position.x -= 60 # change x position to keep centered. 
+
+
+func _on_decrease_goal_button_pressed():
+	if Global.nights_goal == 10: # if it is a double digit becoming single digit.
+		$Goal_Label.position.x += 60 # change x position to keep centered. 
+	if Global.nights_goal != 0:
+		Global.update_nights_goal(Global.nights_goal-1)
+	if (Global.nights_goal) != 0:
+		$Goal_Label.text = str(Global.nights_goal)
+	else:
+		$Goal_Background_Sprite2D.texture = infinite_goal_background
+		$Decrease_goal_Button.icon = Nights_goal_infinite
+		$Goal_Label.hide()
+		
