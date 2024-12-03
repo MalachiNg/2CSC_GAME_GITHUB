@@ -15,7 +15,22 @@ var player_2_died_from: int = 0
 var WASD_and_arrows = true
 var instructions_opened = false
 var nights_goal : int = 0
+var instructions_opened_text_file = "res://instructions_opened.txt"
 
+func _ready():
+	var instructions_opened_boolean = get_text_file_content(instructions_opened_text_file) # keeping same name as in other func, 
+	# as the variables are local.
+	if not instructions_opened_boolean: # for whatever reason, 
+		# instructions_file_as_text.find("true") returns true when it isnt found, and false when it is, 
+		# therefore is instructions opened bool is false, then set instructions opened to true. 
+		instructions_opened = true
+
+func get_text_file_content(filePath):
+	var access_instructions_file = FileAccess.open(filePath, FileAccess.READ)
+	var instructions_file_as_text = access_instructions_file.get_file_as_string(filePath)
+	var instructions_opened_boolean : bool
+	instructions_opened_boolean = instructions_file_as_text.find("true")
+	return instructions_opened_boolean
 
 
 func update_player_2_position(pos: Vector2):
@@ -95,7 +110,10 @@ func update_WASD_and_arrows(new_bool_value: bool):
 
 func update_instructions_opened():
 	# this one doesn't get changed back to false, so doesn't need the same bool_variable : bool, instructions_opened = bool_variable thing.
-	instructions_opened = true
+	instructions_opened = true # changes it for this run
+	# changes it for the next runs:
+	var instructions_opened_content = FileAccess.open(instructions_opened_text_file, FileAccess.WRITE)
+	instructions_opened_content.store_string("true")
 
 func update_nights_goal(goal : int):
 	nights_goal = goal

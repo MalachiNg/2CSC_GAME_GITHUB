@@ -31,6 +31,9 @@ animations = [{
 radius = 24.0208
 
 [node name="Reactor" type="Area2D"]
+top_level = true
+z_index = 1
+z_as_relative = false
 script = ExtResource("1_11isy")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

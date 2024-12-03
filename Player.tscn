@@ -59,15 +59,18 @@ const Food_CRITICAL = preload(\"res://Critical_food_texture.png\")
 @onready var WASD_and_arrows_control_mode = Global.WASD_and_arrows
 @onready var player_immune_to_mob_damage = false # the purpose of this is to ensure that mob clusters are less dangerous, 
 # and that the shape of mobs collisionshapes doesn't cause 1 hit to be 2. 
-var shield_equipped = false
+@onready var shield_equipped = false
 @onready var angle : int
-var path_follow: PathFollow2D
+@onready var path_follow: PathFollow2D
 const shield_rotation_speed = 0.6
-var shields_picked_up = 0
+@onready var shields_picked_up = 0
 @onready var single_player = Global.single_player # this avoids accessing Global all the time, making the code more efficient. 
 @onready var player_respawning = false # lets cutscene code know if the player is in the process of respawning.
 @onready var player_respawning_second : int # this is used if the respawning process is interrupted by the cutscene. 
 # then after the cutscene this variable will be used to see where the countdown left off.
+@onready var high_score_text_file = \"res://local_high_score.txt\"
+@onready var high_score : int
+@onready var new_high_score_set = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -79,10 +82,12 @@ func _ready():
 		Signals.game_won.connect(self.multiplayer_game_over)
 	Global.update_player_position(global_position) # this is added, 
 	# as it is required to run before process, so that mobs spawning can function properly on the first night.
+	high_score = read_from_high_score_file(high_score_text_file)
 	$Night_scene_Sprite2D.hide()
 	$Respawning_PointLight2D.hide()
 	$Respawning_Label.hide()
 	$Respawning_Sprite2D.hide()
+	$High_score_Label.hide()
 	path_follow = $Path2D/PathFollow2D
 	if single_player:
 		$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
@@ -120,6 +125,7 @@ func _ready():
 		$Health_Bar_PointLight2D.hide()
 		$Food_Bars_PointLight2D.hide()
 		$Camera2D.enabled = true
+	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -424,16 +430,26 @@ func multiplayer_game_over():
 	$Game_Over_Back_Button/Game_Over_Back_Button_PointLight2D.hide()
 	$Game_over_screen_Sprite2D.scale = Vector2(10,10)
 	$Game_Over_Back_Button.scale = Vector2(0.8,0.8) ; $Game_Over_Back_Button.global_position = Vector2(-100,-100)
-	$Score.scale = Vector2(7,7) ; $Score.global_position = Vector2(860, 840)
+	$Score.scale = Vector2(7,7) ; $Score.global_position = Vector2(780, 840)
 	$Nights_survived.scale = Vector2(7,7) ; $Nights_survived.global_position = Vector2(580, 1000)
 	$Game_over_screen_Sprite2D.global_position = Vector2(1152, 648)
 	$Path2D/PathFollow2D/Shield_Sprite2D.hide()
 	$Health_Bar_PointLight2D.hide()
+	$High_score_Label.show()
 	
 	calculate_score_and_nights_survived()
 	
 	$Score.text = \"SCORE: \"+ str(final_score)
 	$Nights_survived.text = \"NIGHTS SURVIVED: \" + str(nights_survived)
+	
+	if new_high_score_set:
+		$High_score_Label.text = \"NEW HIGH SCORE!\"
+		$High_score_Label.scale = Vector2(14, 14)
+		$High_score_Label.global_position = Vector2(170, 1130)
+	else:
+		$High_score_Label.scale = Vector2(7, 7)
+		$High_score_Label.text = \"HIGH SCORE: \" + str(high_score)
+		$High_score_Label.global_position = Vector2(550, 1150)
 	
 	if Global.game_over:
 		$Player_2_Died_from_Label.show() ; $Died_from_Label.show()
@@ -472,11 +488,12 @@ func game_over():
 	$Fuel_left_Sprite2D.hide()
 	$Fuel_Left_Label.hide()
 	$Path2D/PathFollow2D/Shield_Sprite2D.hide()
+	$High_score_Label.show()
 	
 	calculate_score_and_nights_survived()
 	
 	$Score.text = \"SCORE: \"+ str(final_score)
-	$Score.position = Vector2(-50,30)
+	$Score.position = Vector2(-12.5,30)
 	$Score.show()
 	
 	$Nights_survived.text = \"NIGHTS SURVIVED: \" + str(nights_survived)
@@ -501,6 +518,14 @@ func game_over():
 		$Fuel_left_Sprite2D.show()
 		game_over_run = true # prevent in-game code from running in player scene
 		Global.update_game_over(true) # prevent in-game code from running in other scenes.
+	
+	if new_high_score_set:
+		$High_score_Label.text = \"NEW HIGH SCORE!\"
+		$High_score_Label.scale = Vector2(2, 2)
+		$High_score_Label.position = Vector2(-100, 70)
+	else:
+		$High_score_Label.text = \"HIGH SCORE: \" + str(high_score)
+		$High_score_Label.position = Vector2(-31, 70)
 
 
 func gain_health():
@@ -687,7 +712,10 @@ func calculate_score_and_nights_survived():
 	# this entire part of code determining the score helps the score increase exponentially, 
 	# which corresponds to the game's difficulty increasing exponentially, 
 	# meaning a higher score for a harder part of the game played.
-	# this means the score is a better reflection of the player's skill, than just the time they survived.
+	# this means the score is a better reflection of the player's skill, than just the time they survived. 
+	if final_score > high_score: # if the user's score is greater than that of the high score, then:
+		write_to_high_score_file(final_score) # update the high score.
+		new_high_score_set = true
 
 
 func display_food_fuel_and_health_multiplayer():
@@ -926,6 +954,17 @@ func respawn_player():
 			player_respawning = false # this only changes back if the cutscene is inactive. 
 			# otherwise, it could prevent the cutscene's code for this code and teh cutscenes overlapping. 
 			# plus, this is reset to false in the game_over_false code anyways. (assuming the respawning 3 seconds overlaps with that)
+
+
+func read_from_high_score_file(filePath):
+	var access_high_score_file = FileAccess.open(filePath, FileAccess.READ)
+	var high_score_file_as_text = access_high_score_file.get_file_as_string(filePath)
+	return int(high_score_file_as_text)
+
+
+func write_to_high_score_file(new_high_score):
+	var high_score_file_content = FileAccess.open(high_score_text_file, FileAccess.WRITE)
+	high_score_file_content.store_string(str(new_high_score))
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bm726"]
@@ -1218,13 +1257,20 @@ speed_scale = 2.08165e-12
 
 [node name="Score" type="Label" parent="."]
 z_index = 5
-anchors_preset = -1
-anchor_right = 0.586
-anchor_bottom = 0.565
-offset_left = -180.0
-offset_top = 30.0
-offset_right = 184.0
-offset_bottom = 53.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -0.5
+offset_top = -11.5
+offset_right = 0.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Nights_survived" type="Label" parent="."]
 z_index = 5
@@ -1347,6 +1393,19 @@ offset_right = 40.0
 offset_bottom = 23.0
 scale = Vector2(5, 5)
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+
+[node name="High_score_Label" type="Label" parent="."]
+z_index = 5
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_right = 40.0
+offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 
 [connection signal="area_entered" from="CollisionShape2D_Parent_Area2D" to="." method="_on_area_entered"]
 [connection signal="body_entered" from="CollisionShape2D_Parent_Area2D" to="." method="_on_body_entered"]
