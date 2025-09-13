@@ -10,9 +10,9 @@ config_version=5
 
 [application]
 
-config/name="2CSC_GAME_GITHUB"
+config/name="Monster Mania"
 run/main_scene="res://Start_scene.tscn"
-config/features=PackedStringArray("4.3", "GL Compatibility")
+config/features=PackedStringArray("4.4", "GL Compatibility")
 run/max_fps=45
 boot_splash/bg_color=Color(0.141176, 0.141176, 0.141176, 0)
 boot_splash/image="res://Monster_Mania_Loading.png"

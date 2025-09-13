@@ -36,7 +36,7 @@ script/source = "extends CharacterBody2D # using a 2D environment.
 @onready var daytime_process = false
 @onready var elapsed_time : float = 0.0
 @onready var game_over_run = false
-@onready var final_score : float
+@onready var final_score : int
 @onready var showing_fuel_bar = 0
 @onready var touched_food = false
 @onready var food_wait_time : float
@@ -68,7 +68,7 @@ const shield_rotation_speed = 0.6
 @onready var player_respawning = false # lets cutscene code know if the player is in the process of respawning.
 @onready var player_respawning_second : int # this is used if the respawning process is interrupted by the cutscene. 
 # then after the cutscene this variable will be used to see where the countdown left off.
-@onready var high_score_text_file = \"res://local_high_score.txt\"
+@onready var high_score_text_file = \"user://local_high_score.txt\"
 @onready var high_score : int
 @onready var new_high_score_set = false
 
@@ -958,7 +958,7 @@ func respawn_player():
 
 func read_from_high_score_file(filePath):
 	var access_high_score_file = FileAccess.open(filePath, FileAccess.READ)
-	var high_score_file_as_text = access_high_score_file.get_file_as_string(filePath)
+	var high_score_file_as_text = access_high_score_file.get_as_text()
 	return int(high_score_file_as_text)
 
 

@@ -15,9 +15,11 @@ var player_2_died_from: int = 0
 var WASD_and_arrows = true
 var instructions_opened = false
 var nights_goal : int = 0
-var instructions_opened_text_file = "res://instructions_opened.txt"
+var instructions_opened_text_file = "user://instructions_opened.txt"
 
 func _ready():
+	#reset_high_score() # this resets the values of the txt's in user
+	#reset_instructions_opened() # same thing - ensure both are inactive before exporting
 	var instructions_opened_boolean = get_text_file_content(instructions_opened_text_file) # keeping same name as in other func, 
 	# as the variables are local.
 	if not instructions_opened_boolean: # for whatever reason, 
@@ -27,11 +29,13 @@ func _ready():
 
 func get_text_file_content(filePath):
 	var access_instructions_file = FileAccess.open(filePath, FileAccess.READ)
-	var instructions_file_as_text = access_instructions_file.get_file_as_string(filePath)
+	if access_instructions_file == null:
+		return false # if the file can't load for whatever reason, assume they've never opened the instructions section.
+		print("Instructions opened txt file failed to load. ")
+	var instructions_file_as_text = access_instructions_file.get_as_text()
 	var instructions_opened_boolean : bool
 	instructions_opened_boolean = instructions_file_as_text.find("true")
 	return instructions_opened_boolean
-
 
 func update_player_2_position(pos: Vector2):
 	player_2_position = pos
@@ -117,3 +121,21 @@ func update_instructions_opened():
 
 func update_nights_goal(goal : int):
 	nights_goal = goal
+
+'''
+
+# these correspond to the functions called in the top of func _ready():, 
+# and reset the values in the .txt files in user://
+
+func reset_high_score():
+	var file_path = "user://local_high_score.txt"
+	var file = FileAccess.open(file_path, FileAccess.WRITE)
+	file.store_string("0")  # Reset to 0
+	file.close()
+
+func reset_instructions_opened():
+	var file_path = "user://instructions_opened.txt"
+	var file = FileAccess.open(file_path, FileAccess.WRITE)
+	file.store_string("false")  # Reset to 0
+	file.close()
+'''

@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cfscvba6y153d"]
 
-[ext_resource type="Script" path="res://Shield.gd" id="1_f6iwu"]
+[ext_resource type="Script" uid="uid://c46tj5roio8jr" path="res://Shield.gd" id="1_f6iwu"]
 [ext_resource type="Texture2D" uid="uid://cgr8pxnle8sma" path="res://shield.png" id="2_roaw2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ftds8"]

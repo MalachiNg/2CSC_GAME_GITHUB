@@ -1,6 +1,6 @@
 [gd_scene load_steps=15 format=3 uid="uid://hfrypldrvv5y"]
 
-[ext_resource type="Script" path="res://Sleeper_Mob.gd" id="1_tnmaj"]
+[ext_resource type="Script" uid="uid://ce61gnh2b67yq" path="res://Sleeper_Mob.gd" id="1_tnmaj"]
 [ext_resource type="Texture2D" uid="uid://c60lpt57lfpwd" path="res://Sleeper Mob skin.png" id="2_m7rsc"]
 [ext_resource type="Texture2D" uid="uid://d1cwfojrs0tw8" path="res://white_circle.png" id="3_56g7l"]
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://t1exfq1xaj3n"]
 
-[ext_resource type="Script" path="res://fuel.gd" id="1_o8j2a"]
+[ext_resource type="Script" uid="uid://glmd28ic4a46" path="res://fuel.gd" id="1_o8j2a"]
 [ext_resource type="Texture2D" uid="uid://dsnl4tg2c32a3" path="res://Fuel.png" id="1_ui6go"]
 [ext_resource type="Texture2D" uid="uid://d1cwfojrs0tw8" path="res://white_circle.png" id="3_u58q5"]
 

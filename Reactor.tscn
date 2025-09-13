@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://dofhbb5jpvyis"]
 
-[ext_resource type="Script" path="res://Reactor.gd" id="1_11isy"]
+[ext_resource type="Script" uid="uid://bwe6ju548tqcd" path="res://Reactor.gd" id="1_11isy"]
 [ext_resource type="Texture2D" uid="uid://8navgc1sm01e" path="res://Reactor_off.png" id="2_coj4l"]
 [ext_resource type="Texture2D" uid="uid://duw8cykp2f462" path="res://Reactor_on.png" id="3_rvu8s"]
 

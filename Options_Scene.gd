@@ -7,8 +7,9 @@ const Unselected_2_Players = preload("res://Unselected_2_Players.png")
 
 # TextureRext textures, the different pages:
 # The first one is removed as it is default, so this is un necessary, but also was causing parse errors in the script.
-const Normal_or_Hard_Mode = preload("res://Normal_or_Hard_Mode.png")
-const Mute_or_Unmute = preload("res://Mute_or_Unmute.png")
+const Single_or_Multiplayer = preload("res://Single_or_multiplayer.png")
+const Normal_or_Hard_Mode = preload("res://Normal_or_Hard_mode.png")
+const Mute_or_Unmute = preload("res://Mute_or_unmute.png")
 const WASD_and_arrows_or_cursor = preload("res://WASD_and_arrows_or_cursor.png")
 const Nights_survived_goal = preload("res://Nights_Survived_Goal.png")
 
@@ -56,8 +57,11 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	if page == 1:
+		$TextureRect.texture = Single_or_Multiplayer
 		$Single_Player_Button.show()
 		$Multiplayer_Button.show()
+		$Hard_Mode_Button.hide()
+		$Normal_Mode_Button.hide()
 
 	elif page == 2:
 		$TextureRect.texture = Normal_or_Hard_Mode
@@ -65,25 +69,39 @@ func _process(_delta):
 		$Multiplayer_Button.hide()
 		$Hard_Mode_Button.show()
 		$Normal_Mode_Button.show()
+		$Mute_Button.hide()
+		$Unmute_Button.hide()
 		normal_or_hard()
 
 	elif page == 3:
 		$TextureRect.texture = Mute_or_Unmute
 		$Hard_Mode_Button.hide()
 		$Normal_Mode_Button.hide()
+		$Mute_Button.show()
+		$Unmute_Button.show()
+		$Decrease_goal_Button.hide()
+		$Increase_goal_Button.hide()
+		$Goal_Background_Sprite2D.hide()
+		$Goal_Label.hide()
 		mute_or_unmute()
 	elif page == 4:
 		$Mute_Button.hide()
 		$Unmute_Button.hide()
+		$Decrease_goal_Button.show()
+		$Increase_goal_Button.show()
+		$Goal_Background_Sprite2D.show()
+		$WASD_and_arrows_Button.hide()
+		$Cursor_Button.hide()
 		if not Global.single_player:
 			$Next_Button.hide()
 		nights_survived_select()
 	elif page == 5:
-		$Next_Button.hide()
 		$Goal_Background_Sprite2D.hide()
 		$Increase_goal_Button.hide()
 		$Decrease_goal_Button.hide()
 		$Goal_Label.hide()
+		$WASD_and_arrows_Button.show()
+		$Cursor_Button.show()
 		$TextureRect.texture = WASD_and_arrows_or_cursor
 		wasd_and_arrows_or_cursor()
 
@@ -120,7 +138,10 @@ func Selected_Single_Player():
 
 
 func _on_back_button_pressed():
-	get_tree().change_scene_to_file("res://Start_scene.tscn")
+	if page == 1:
+		get_tree().change_scene_to_file("res://Start_scene.tscn")
+	else:
+		page -= 1
 
 
 func _on_next_button_pressed():
@@ -145,11 +166,13 @@ func _on_next_button_pressed():
 		infinite_goal_background = preload("res://infinite_goal_background.png")
 		regular_goal_background = preload("res://nights_survived_goal_background.png")
 
-	else:
+	elif page == 5:
 		Selected_WASD_and_arrows = preload("res://WASD_and_arrows_selected.png")
 		Unselected_WASD_and_arrows = preload("res://WASD_and_arrows_unselected.png")
 		Selected_cursor = preload("res://Cursor_selected.png")
 		Unselected_cursor = preload("res://Cursor_unselected.png")
+	elif page == 6:
+		get_tree().change_scene_to_file("res://Start_scene.tscn")
 
 
 func normal_or_hard():
@@ -186,8 +209,6 @@ func _on_mute_button_pressed():
 
 
 func mute_or_unmute():
-	$Mute_Button.show()
-	$Unmute_Button.show()
 	if Global.Unmute:
 		$Mute_Button.icon = Unselected_Mute
 		$Unmute_Button.icon = Selected_Unmute
@@ -197,8 +218,6 @@ func mute_or_unmute():
 
 
 func wasd_and_arrows_or_cursor():
-	$WASD_and_arrows_Button.show()
-	$Cursor_Button.show()
 	if Global.WASD_and_arrows:
 		$WASD_and_arrows_Button.icon = Selected_WASD_and_arrows
 		$Cursor_Button.icon = Unselected_cursor
@@ -219,9 +238,6 @@ func _on_cursor_button_pressed():
 	$Cursor_Button.icon = Selected_cursor
 
 func nights_survived_select():
-	$Decrease_goal_Button.show()
-	$Increase_goal_Button.show()
-	$Goal_Background_Sprite2D.show()
 	$TextureRect.texture = Nights_survived_goal
 	if Global.nights_goal != 0:
 		$Decrease_goal_Button.icon = Decrease_nights_goal

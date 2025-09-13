@@ -1,7 +1,7 @@
 [gd_scene load_steps=22 format=3 uid="uid://b36xnqm67le4w"]
 
 [ext_resource type="Texture2D" uid="uid://dooa401v4n8n1" path="res://Mob_1.png" id="1_6aeo7"]
-[ext_resource type="Script" path="res://Boss_mob.gd" id="1_w75u0"]
+[ext_resource type="Script" uid="uid://gahtgdq1gbx" path="res://Boss_mob.gd" id="1_w75u0"]
 [ext_resource type="Texture2D" uid="uid://g6g3m8khfbpw" path="res://Mob_2.png" id="2_xjf4r"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_no17y"]
