@@ -1,0 +1,271 @@
+extends Node
+const Selected_1_Player = preload("res://Selected_1_Player.png")
+const Unselected_1_Player = preload("res://Unselected_1_Player.png")
+const Selected_2_Players = preload("res://Selected_2_Players.png")
+const Unselected_2_Players = preload("res://Unselected_2_Players.png")
+@onready var page = 1
+
+# TextureRext textures, the different pages:
+# The first one is removed as it is default, so this is un necessary, but also was causing parse errors in the script.
+const Single_or_Multiplayer = preload("res://Single_or_multiplayer.png")
+const Normal_or_Hard_Mode = preload("res://Normal_or_Hard_mode.png")
+const Mute_or_Unmute = preload("res://Mute_or_unmute.png")
+const WASD_and_arrows_or_cursor = preload("res://WASD_and_arrows_or_cursor.png")
+const Nights_survived_goal = preload("res://Nights_Survived_Goal.png")
+
+# The following are declared here, but not set to a value.
+# instead, they are set values before they appear, to spread the load out and make performance better.
+# these are variables, not constants, as they change, as they are assigned values later.
+var selected_Normal
+var unselected_Normal
+var selected_Hard
+var unselected_Hard
+var Selected_Unmute
+var Unselected_Unmute
+var Selected_Mute
+var Unselected_Mute
+var Nights_goal_infinite
+var Decrease_nights_goal
+var infinite_goal_background
+var regular_goal_background
+var Selected_WASD_and_arrows
+var Unselected_WASD_and_arrows
+var Selected_cursor
+var Unselected_cursor
+var nights_goal : int = 0
+
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	$Normal_Mode_Button.hide()
+	$Hard_Mode_Button.hide()
+	$Mute_Button.hide()
+	$Unmute_Button.hide()
+	$WASD_and_arrows_Button.hide()
+	$Cursor_Button.hide()
+	$Decrease_goal_Button.hide()
+	$Increase_goal_Button.hide()
+	$Goal_Background_Sprite2D.hide()
+	$Goal_Label.hide()
+	if Global.single_player:
+		Selected_Single_Player()
+	else:
+		Selected_Multiplayer()
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(_delta):
+	if page == 1:
+		$TextureRect.texture = Single_or_Multiplayer
+		$Single_Player_Button.show()
+		$Multiplayer_Button.show()
+		$Hard_Mode_Button.hide()
+		$Normal_Mode_Button.hide()
+
+	elif page == 2:
+		$TextureRect.texture = Normal_or_Hard_Mode
+		$Single_Player_Button.hide()
+		$Multiplayer_Button.hide()
+		$Hard_Mode_Button.show()
+		$Normal_Mode_Button.show()
+		$Mute_Button.hide()
+		$Unmute_Button.hide()
+		normal_or_hard()
+
+	elif page == 3:
+		$TextureRect.texture = Mute_or_Unmute
+		$Hard_Mode_Button.hide()
+		$Normal_Mode_Button.hide()
+		$Mute_Button.show()
+		$Unmute_Button.show()
+		$Decrease_goal_Button.hide()
+		$Increase_goal_Button.hide()
+		$Goal_Background_Sprite2D.hide()
+		$Goal_Label.hide()
+		mute_or_unmute()
+	elif page == 4:
+		$Mute_Button.hide()
+		$Unmute_Button.hide()
+		$Decrease_goal_Button.show()
+		$Increase_goal_Button.show()
+		$Goal_Background_Sprite2D.show()
+		$WASD_and_arrows_Button.hide()
+		$Cursor_Button.hide()
+		if not Global.single_player:
+			$Next_Button.hide()
+		nights_survived_select()
+	elif page == 5:
+		$Goal_Background_Sprite2D.hide()
+		$Increase_goal_Button.hide()
+		$Decrease_goal_Button.hide()
+		$Goal_Label.hide()
+		$WASD_and_arrows_Button.show()
+		$Cursor_Button.show()
+		$TextureRect.texture = WASD_and_arrows_or_cursor
+		wasd_and_arrows_or_cursor()
+
+
+func _on_single_player_button_pressed():
+	Global.update_single_player(true)
+	Selected_Single_Player()
+
+
+# 2 selected is slightly smaller
+
+
+func _on_multiplayer_button_pressed():
+	Global.update_single_player(false)
+	Selected_Multiplayer()
+
+
+func Selected_Multiplayer():
+	$Single_Player_Button.icon = Unselected_1_Player
+	$Single_Player_Button.scale = Vector2(1.18, 1.18)
+	$Single_Player_Button.position = Vector2(462, 786)
+	$Multiplayer_Button.icon = Selected_2_Players
+	$Multiplayer_Button.scale = Vector2(1.7, 1.7)
+	$Multiplayer_Button.position = Vector2(92, 1036)
+
+
+func Selected_Single_Player():
+	$Single_Player_Button.icon = Selected_1_Player
+	$Single_Player_Button.position = Vector2(100, 756)
+	$Single_Player_Button.scale = Vector2(1.5, 1.5)
+	$Multiplayer_Button.icon = Unselected_2_Players
+	$Multiplayer_Button.position = Vector2(334, 1052)
+	$Multiplayer_Button.scale = Vector2(1.5, 1.5)
+
+
+func _on_back_button_pressed():
+	if page == 1:
+		get_tree().change_scene_to_file("res://Start_scene.tscn")
+	else:
+		page -= 1
+
+
+func _on_next_button_pressed():
+	page += 1
+	if page == 2:
+		# these previously declared variables are now given values, so that the stress on the CPU
+		# is spread out throughout the scene, as opposed to all happening at the start, causing lag.
+		# this here runs if the page is Normal or hard mode, and only runs when the next button is pressed.
+		selected_Normal = preload("res://Normal_Mode_Selected.png")
+		unselected_Normal = preload("res://Normal_Mode_Button.png")
+		selected_Hard = preload("res://Hard_Mode_Selected.png")
+		unselected_Hard = preload("res://Hard_Mode_Button.png")
+	elif page == 3:
+		# this runs on Mute or Unmute. the first page runs at the start so doesn't need to be in here.
+		Selected_Unmute = preload("res://Selected_Unmute.png")
+		Unselected_Unmute = preload("res://Unselected_Unmute.png")
+		Selected_Mute = preload("res://Selected_Mute.png")
+		Unselected_Mute = preload("res://Unselected_Mute.png")
+	elif page == 4:
+		Decrease_nights_goal = preload("res://decrease_goal_arrow_button.png")
+		Nights_goal_infinite = preload("res://goal_on_0_arrow_button.png") # when the nights is 0, it is an infinite goal. 
+		infinite_goal_background = preload("res://infinite_goal_background.png")
+		regular_goal_background = preload("res://nights_survived_goal_background.png")
+
+	elif page == 5:
+		Selected_WASD_and_arrows = preload("res://WASD_and_arrows_selected.png")
+		Unselected_WASD_and_arrows = preload("res://WASD_and_arrows_unselected.png")
+		Selected_cursor = preload("res://Cursor_selected.png")
+		Unselected_cursor = preload("res://Cursor_unselected.png")
+	elif page == 6:
+		get_tree().change_scene_to_file("res://Start_scene.tscn")
+
+
+func normal_or_hard():
+	if Global.Normal_mode:
+		$Normal_Mode_Button.icon = selected_Normal
+		$Hard_Mode_Button.icon = unselected_Hard
+	else:
+		$Normal_Mode_Button.icon = unselected_Normal
+		$Hard_Mode_Button.icon = selected_Hard
+
+
+func _on_hard_mode_button_pressed():
+	Global.update_normal_mode(false)
+	$Normal_Mode_Button.icon = unselected_Normal
+	$Hard_Mode_Button.icon = selected_Hard
+
+
+func _on_normal_mode_button_pressed():
+	Global.update_normal_mode(true)
+	$Normal_Mode_Button.icon = selected_Normal
+	$Hard_Mode_Button.icon = unselected_Hard
+
+
+func _on_unmute_button_pressed():
+	Global.update_unmute(true)
+	$Unmute_Button.icon = Selected_Unmute
+	$Mute_Button.icon = Unselected_Mute
+
+
+func _on_mute_button_pressed():
+	Global.update_unmute(false)
+	$Unmute_Button.icon = Unselected_Unmute
+	$Mute_Button.icon = Selected_Mute
+
+
+func mute_or_unmute():
+	if Global.Unmute:
+		$Mute_Button.icon = Unselected_Mute
+		$Unmute_Button.icon = Selected_Unmute
+	else:
+		$Mute_Button.icon = Selected_Mute
+		$Unmute_Button.icon = Unselected_Unmute
+
+
+func wasd_and_arrows_or_cursor():
+	if Global.WASD_and_arrows:
+		$WASD_and_arrows_Button.icon = Selected_WASD_and_arrows
+		$Cursor_Button.icon = Unselected_cursor
+	else:
+		$WASD_and_arrows_Button.icon = Unselected_WASD_and_arrows
+		$Cursor_Button.icon = Selected_cursor
+
+
+func _on_wasd_and_arrows_button_pressed():
+	Global.update_WASD_and_arrows(true)
+	$WASD_and_arrows_Button.icon = Selected_WASD_and_arrows
+	$Cursor_Button.icon = Unselected_cursor
+
+
+func _on_cursor_button_pressed():
+	Global.update_WASD_and_arrows(false)
+	$WASD_and_arrows_Button.icon = Unselected_WASD_and_arrows
+	$Cursor_Button.icon = Selected_cursor
+
+func nights_survived_select():
+	$TextureRect.texture = Nights_survived_goal
+	if Global.nights_goal != 0:
+		$Decrease_goal_Button.icon = Decrease_nights_goal
+		$Goal_Background_Sprite2D.texture = regular_goal_background
+		$Goal_Label.show()
+		$Goal_Label.text = str(Global.nights_goal)
+	# no else needed, the other is default. 
+	
+	
+
+
+func _on_increase_goal_button_pressed():
+	$Goal_Label.show()
+	Global.update_nights_goal(Global.nights_goal+1)
+	$Goal_Label.text = str(Global.nights_goal)
+	if Global.nights_goal == 10: # if it became double digit from single digit:
+		$Goal_Label.position.x -= 60 # change x position to keep centered. 
+
+
+func _on_decrease_goal_button_pressed():
+	if Global.nights_goal == 10: # if it is a double digit becoming single digit.
+		$Goal_Label.position.x += 60 # change x position to keep centered. 
+	if Global.nights_goal != 0:
+		Global.update_nights_goal(Global.nights_goal-1)
+	if (Global.nights_goal) != 0:
+		$Goal_Label.text = str(Global.nights_goal)
+	else:
+		$Goal_Background_Sprite2D.texture = infinite_goal_background
+		$Decrease_goal_Button.icon = Nights_goal_infinite
+		$Goal_Label.hide()
+		
